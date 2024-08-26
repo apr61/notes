@@ -53,6 +53,18 @@ export default defineConfig({
 						{ label: 'Async Await', slug: 'javascript/async-js' },
 					],
 				},
+				{
+					label: "Java",
+					items: [
+						{ label: "Getting started with Java", slug: 'java/getting-started'},
+						{ label: "Collection Framework",
+							items: [
+								{label: "What is collection framework", slug: 'java/collections-framework/what-is-collection-framework'},
+								{label: "Wrapper classes", slug: 'java/collections-framework/wrapper-classes'}
+							]
+						}
+					]
+				}
 			],
 		}),
 	],
