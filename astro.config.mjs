@@ -37,6 +37,7 @@ export default defineConfig({
 							]
 						},
 					],
+					collapsed: true
 				},
 				{
 					label: 'JavaScript',
@@ -52,6 +53,7 @@ export default defineConfig({
 						{ label: 'Promises', slug: 'javascript/promises-in-js' },
 						{ label: 'Async Await', slug: 'javascript/async-js' },
 					],
+					collapsed: true
 				},
 				{
 					label: "Java",
@@ -60,10 +62,19 @@ export default defineConfig({
 						{ label: "Collection Framework",
 							items: [
 								{label: "What is collection framework", slug: 'java/collections-framework/what-is-collection-framework'},
-								{label: "Wrapper classes", slug: 'java/collections-framework/wrapper-classes'}
+								{label: "Wrapper classes", slug: 'java/collections-framework/wrapper-classes'},
+								{label: "Generics", slug: 'java/collections-framework/generics'},
+								{label: "ArrayList", slug: 'java/collections-framework/arraylist'},
+								{label: "Vector Collection", slug: 'java/collections-framework/vector-collection'},
+								{label: "Stack", slug: 'java/collections-framework/stack'},
+								{label: "Linked List", slug: 'java/collections-framework/linked-list'},
+								{label: "Set", slug: 'java/collections-framework/set'},
+								{label: "Map", slug: 'java/collections-framework/map'},
+								
 							]
 						}
-					]
+					],
+					collapsed: true
 				}
 			],
 		}),
