@@ -115,16 +115,27 @@ export default defineConfig({
                   slug: "java/collections-framework/comparator",
                 },
               ],
-			  collapsed: true
+              collapsed: true,
             },
             {
               label: "Java 8",
-			  items: [
-				{
-					label: "Static and default methods in Interface",
-					slug: "java/java8/static-default-methods-in-interface"
-				}
-			  ]
+              items: [
+                {
+                  label: "Static and default methods in Interface",
+                  slug: "java/java8/static-default-methods-in-interface",
+                },
+              ],
+              collapsed: true
+            },
+            {
+              label: "Advanced Java",
+              items: [
+                {
+                  label: "JDBC",
+                  slug: "java/advanced-java/jdbc",
+                },
+              ],
+              collapsed: true
             },
           ],
           collapsed: true,
