@@ -124,6 +124,10 @@ export default defineConfig({
                   label: "Static and default methods in Interface",
                   slug: "java/java8/static-default-methods-in-interface",
                 },
+                {
+                  label: "Functional interface",
+                  slug: "java/java8/functional-interface",
+                },
               ],
               collapsed: true
             },
