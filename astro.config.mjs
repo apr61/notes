@@ -138,6 +138,10 @@ export default defineConfig({
                   label: "JDBC",
                   slug: "java/advanced-java/jdbc",
                 },
+                {
+                  label: "Servlet",
+                  slug: "java/advanced-java/servlet"
+                }
               ],
               collapsed: true
             },
