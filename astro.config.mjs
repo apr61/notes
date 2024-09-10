@@ -128,6 +128,10 @@ export default defineConfig({
                   label: "Functional interface",
                   slug: "java/java8/functional-interface",
                 },
+                {
+                  label: "Lambda Expressions",
+                  slug: "java/java8/lambda-expressions",
+                },
               ],
               collapsed: true
             },
