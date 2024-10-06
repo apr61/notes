@@ -51,6 +51,13 @@ export default defineConfig({
                 },
               ],
             },
+            {
+              label: "cmake",
+              items: [
+                { label: "Shared Library", slug: "cpp/cmake/shared-lib" },
+                { label: "Static Library", slug: "cpp/cmake/static-lib" },
+              ],
+            },
           ],
           collapsed: true,
         },
