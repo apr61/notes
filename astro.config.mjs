@@ -62,6 +62,21 @@ export default defineConfig({
           collapsed: true,
         },
         {
+          label: "Networking",
+          items: [
+            {
+              label: "TLS",
+              items: [
+                {
+                  label: "PKI",
+                  slug: "networking/tls/pki"
+                }
+              ]
+            }
+          ],
+          collapsed: true,
+        },
+        {
           label: "JavaScript",
           items: [
             { label: "Code execution", slug: "javascript/exection-of-code" },
