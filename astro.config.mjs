@@ -72,9 +72,32 @@ export default defineConfig({
                   slug: "networking/tls/pki"
                 }
               ]
+            },
+            {
+              label: "Firewall",
+              items: [
+                {
+                  label: "iptables",
+                  slug: "networking/firewall/iptables"
+                }
+              ]
             }
           ],
           collapsed: true,
+        },
+        {
+          label: "Linux",
+          items: [
+            {
+              label: "dbus",
+              slug: "linux/dbus"
+            },
+            {
+              label: "dbus qa",
+              slug: "linux/dbus-qa"
+            }
+          ],
+          collapsed: true
         },
         {
           label: "JavaScript",
