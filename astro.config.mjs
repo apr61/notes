@@ -97,6 +97,15 @@ export default defineConfig({
                   slug: "networking/firewall/iptables"
                 }
               ]
+            },
+            {
+              label: "Cryptography",
+              items: [
+                {
+                  label: "Sign-Verify Data",
+                  slug: "networking/cryptography/sign-verify-data"
+                }
+              ]
             }
           ],
           collapsed: true,
