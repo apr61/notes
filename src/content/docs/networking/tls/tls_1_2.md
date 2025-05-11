@@ -158,11 +158,11 @@ Client                               Server
 
 #### TLS 1.2 One Way TLS
 
-![TLS 1.2 PCAP logs](/public/images/tls1_2_pcap.png)
+![TLS 1.2 PCAP logs](/images/tls1_2_pcap.png)
 
 ---
 
-![TLS 1.2 PCAP logs](/public/images/tls1_2_tcp.png)
+![TLS 1.2 PCAP logs](/images/tls1_2_tcp.png)
 
 ---
 

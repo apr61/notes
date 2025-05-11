@@ -90,11 +90,11 @@ Client         →       Server
 
 ### Pcap logs of TLS 1.3
 
-![TLS 1.3 pcap](/public/images/tls1_3_pcap.png)
+![TLS 1.3 pcap](/images/tls1_3_pcap.png)
 
 ---
 
-![TLS 1.3 pcap](/public/images/tls1_3_tcp.png)
+![TLS 1.3 pcap](/images/tls1_3_tcp.png)
 
 #### Breakdown: What you’ll see in the PCAP (without decryption)
 
