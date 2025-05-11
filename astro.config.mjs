@@ -68,6 +68,22 @@ export default defineConfig({
               label: "TLS",
               items: [
                 {
+                  label: "TLS 1.2",
+                  slug: "networking/tls/tls_1_2"
+                },
+                {
+                  label: "TLS 1.3",
+                  slug: "networking/tls/tls_1_3"
+                },
+                {
+                  label: "TLS 1.2 vs TLS 1.3",
+                  slug: "networking/tls/tls_1_2_vs_tls_1_3"
+                },
+                {
+                  label: "Cryptography Terms",
+                  slug: "networking/tls/cryptography_terms"
+                },
+                {
                   label: "PKI",
                   slug: "networking/tls/pki"
                 }
@@ -95,6 +111,15 @@ export default defineConfig({
             {
               label: "dbus qa",
               slug: "linux/dbus-qa"
+            },
+            {
+              label: "selinux",
+              items: [
+                {
+                  label: "SE Linux Context",
+                  slug: "linux/selinux/selinux"
+                }
+              ]
             }
           ],
           collapsed: true
