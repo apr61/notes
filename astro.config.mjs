@@ -62,48 +62,60 @@ export default defineConfig({
           collapsed: true,
         },
         {
-          label: "Networking",
+          label: "Cryptography",
           items: [
+            {
+              label: "Algorithms",
+              items: [
+                {
+                  label: "Symmetric",
+                  items: [
+                    {
+                      label: "AES",
+                      slug: "cryptography/algorithms/symmetric/aes"
+                    }
+                  ]
+                },
+                {
+                  label: "Asymmetric",
+                  items: [
+                    {
+                      label: "RSA overview",
+                      slug: "cryptography/algorithms/asymmetric/rsa"
+                    }
+                  ]
+                },
+              ]
+            },
             {
               label: "TLS",
               items: [
                 {
-                  label: "TLS 1.2",
-                  slug: "networking/tls/tls_1_2"
-                },
-                {
-                  label: "TLS 1.3",
-                  slug: "networking/tls/tls_1_3"
-                },
-                {
-                  label: "TLS 1.2 vs TLS 1.3",
-                  slug: "networking/tls/tls_1_2_vs_tls_1_3"
+                  label: "TLS 1.2 Overview",
+                  slug: "cryptography/tls/tls_1_2_overview"
                 },
                 {
                   label: "Cryptography Terms",
-                  slug: "networking/tls/cryptography_terms"
+                  slug: "cryptography/tls/cryptography_terms"
                 },
                 {
                   label: "PKI",
-                  slug: "networking/tls/pki"
+                  slug: "cryptography/tls/pki"
                 }
               ]
             },
+          ],
+          collapsed: true,
+        },
+        {
+          label: "Networking",
+          items: [
             {
               label: "Firewall",
               items: [
                 {
                   label: "iptables",
                   slug: "networking/firewall/iptables"
-                }
-              ]
-            },
-            {
-              label: "Cryptography",
-              items: [
-                {
-                  label: "Sign-Verify Data",
-                  slug: "networking/cryptography/sign-verify-data"
                 }
               ]
             }
