@@ -82,6 +82,10 @@ export default defineConfig({
                     {
                       label: "RSA overview",
                       slug: "cryptography/algorithms/asymmetric/rsa"
+                    },
+                    {
+                      label: "ECC overview",
+                      slug: "cryptography/algorithms/asymmetric/ecc"
                     }
                   ]
                 },
