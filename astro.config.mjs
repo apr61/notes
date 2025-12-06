@@ -89,6 +89,15 @@ export default defineConfig({
                     }
                   ]
                 },
+                {
+                  label: "Misc",
+                  items: [
+                    {
+                      label: "CMS overview",
+                      slug: "cryptography/misc/cms"
+                    }
+                  ]
+                },
               ]
             },
             {
