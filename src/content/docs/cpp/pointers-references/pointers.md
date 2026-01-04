@@ -4,33 +4,75 @@ date: 20/8/2024
 ---
 
 
-A pointer is a variable that is used to store the address of a variable or an object. Three main purposes.
+A pointer is a variable that is used to store the address of a variable or an object or function. Three main purposes.
 1.	To allocate new objects in heap memory
 2.	To pass functions to other functions
 3.	To iterate over elements of arrays or other data structures
+
+## Function Pointer
+
+```c++
+int add(int a, int b)
+{
+    return a + b;
+}
+
+int main()
+{
+    int (*funcptr) (int, int) = add; // Pointer `funcptr` not points to add
+
+    funcptr(2,3); // Returns 5
+}
+```
 
 ## Const pointers
 Two types of const pointer
 1. Pointer Constant
 2. Constant Pointer
+3. Constant pointer to constant
 
-### Pointer Constant
-__Value constant__ and __address changes__.
+### 1. Pointer Constant
+__Value constant__ and __address changes__
 
 #### Syntax
 
 ```c++
-const int * ptr_name;
+int x = 10;
+int y = 20;
+
+const int * ptr_name = &x;
 // Or
-int const * ptr_name;
+int const * ptr_name = &x;
+
+*ptr_name = 20; // ERROR
+
+ptr_name = &y; // PASS
 ```
 
-### Constant Pointer
-__Address constant__ and __value changes__.
+### 2. Constant Pointer
+__Address constant__ and __value changes__
 
 #### Syntax
 ```c++
-int * const ptr_name;
+int x = 10;
+int y = 20;
+
+int * const ptr_name = &x;
+
+*ptr_name = 20;
+
+ptr_name = &y; // ERROR
+
+```
+
+### 3. Constant pointer to constant
+__Address and value constant__
+
+#### Syntax
+```c++
+int x = 10;
+
+const int * const ptr = &x;
 ```
 
 ## new - delete operators

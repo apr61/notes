@@ -13,8 +13,34 @@ export default defineConfig({
         {
           label: "CPP",
           items: [
+            { label: "Getting Stated", slug: "cpp/getting-started" },
             { label: "Basics", slug: "cpp/basics-in-cpp" },
-            { label: "Pointers", slug: "cpp/pointers-in-cpp" },
+            {
+              label: "Basics", items: [
+                { label: "Memory model", slug: "cpp/basics/memory-model" },
+                { label: "Memory model", slug: "cpp/basics/compilation-stages" },
+                {
+                  label: "Type Casters",
+                  slug: "cpp/basics/advanced-type-casters-in-cpp",
+                },
+                {
+                  label: "Operator Overloading",
+                  slug: "cpp/basics/operator-overloading-in-cpp",
+                },
+                {
+                  label: "Shallow Copy and deep copy",
+                  slug: "cpp/basics/shallow-copy-deep-copy",
+                },
+              ]
+            },
+            {
+              label: "Pointers and References",
+              items:
+                [
+                  { label: "Pointers", slug: "cpp/pointers-references/pointers" },
+                  { label: "References", slug: "cpp/pointers-references/references" }
+                ]
+            },
             {
               label: "Oops",
               items: [
@@ -26,19 +52,6 @@ export default defineConfig({
                   slug: "cpp/oops/aggregation-composition",
                 },
               ],
-            },
-            {
-              label: "Advanced Type Casters",
-              slug: "cpp/advanced-type-casters-in-cpp",
-            },
-            {
-              label: "Opeartor Overloading",
-              slug: "cpp/operator-overloading-in-cpp",
-            },
-            { label: "Type Inference", slug: "cpp/type-inference-in-cpp" },
-            {
-              label: "Shallow Copy and deep copy",
-              slug: "cpp/shallow-copy-deep-copy",
             },
             {
               label: "CPP 11",
