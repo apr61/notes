@@ -1,0 +1,6516 @@
+
+
+
+# CPP
+
+1. [Namespace](#namespace)
+2. [Default Arguments in functions](#default-arguments-in-functions)
+3. [nullptr](#nullptr)
+4. [Templates](#templates)
+5. [OOPS](#oops)
+    1. [Class](#class)
+    2. [Object](#object)
+    3. [Access Specifiers](#access-specifiers)
+    4. [Constructor](#constructor)
+    5. [Types of Constructors](#types-of-constructors)
+        1. [Default Contructor](#default-constructor)
+        2. [Parameterized Constructor](#parameterized-constructor)
+        3. [Copy Constructor](#copy-constructor)
+        4. [Move Constructor](#move-constructor)
+    6. [Destructor](#destructor)
+    7. [this](#this)
+    8. [`const` member functions](#const-member-functions)
+    9. [mutable](#mutable)
+    10. [Static members](#static-members)
+    11. [explicit keyword](#explicit)
+    12. [Initializer list](#initializer-list)
+
+6. [Pointers](#pointers)
+    1. [Const pointers](#const-pointer)
+        1. [Pointer Constant](#pointer-constant)
+        2. [Constant Pointer](#constant-pointer)
+    2. [new - delete operators](#new---delete-operators)
+        1. [new operator](#new-operator)
+        2. [delete operator](#delete-operator)
+    3. [new - delete operator subscript \[\]](#new---delete-operator-subscript)
+    4. [Handling insufficient memory](#handling-insufficient-memory)
+        1. [`nothrow` form of `new`](#nothrow-form-of-new)
+    5. [Placement `new`](#placement-new)
+    6. [Difference between `new` and `placement new`](#difference-between-new-and-placement-new)
+
+7. [Advanced Type casters](#advanced-type-casters)
+    1. [Const Cast](#const-cast)
+    2. [Reinterpret Cast](#reinterpret-cast)
+    3. [Static Cast](#static-cast)
+    4. [Dynamic Cast](#dynamic-cast)
+
+8. [C++ 11]
+
+***
+
+
+
+***
+
+## Polymorphism
+
+The word __polymorphism__ means having many forms. We can define polymorphism as the ability of a message to be displayed in more than one form.
+
+## Types of Polymorphism
+1. Compile Time Polymorphism
+    1. Function Overloading
+    2. Operator Overloading
+2. Run Time Polymorphism / Late Binding / Dynamic Ploymorphism
+    1. Function Overriding (Virtual Functions)
+
+## Compile Time Polymorphism
+This type of polymorphism is acheived by __Function Overloading__ or __Operator Overloading__.
+
+## Function Overloading
+
+When there are multiple functions with same name and different parameters, thoses functions are called overloadded funtions. __Function Overloading__ can be achieved by changing the __number of arguments__ or/and changing the __type of arguments__.
+
+> __Note__: Just changing __return type__ and __order of parameters__  doesn't perform Function Overloading.
+
+```c++
+
+int add(int x, int  y){
+    return x + y;
+}
+
+int add(int x, int  y, int z){
+    return x + y + z;
+}
+
+double add(double x, double y){
+    return x + y;
+}
+
+int add(double x, double y){
+    return x + y;
+}
+
+int main()
+{
+    cout << "add(1, 3) = " << add(1,3) << endl;
+    cout << "add(1, 3, 5) = " << add(1,3, 5) << endl;
+    cout << "add(1.5, 3.5) = " << add(1.5,3.5) << endl;
+}
+```
+
+#### Output
+```sh
+add(1, 3) = 4
+add(1, 3, 5) = 9
+add(1.5, 3.5) = 5
+```
+
+## Run Time Polymorphism
+
+This type of polymorphism is achieved by __Function Overriding__. The function call is resolved at runtime in runtime polymorphism. 
+
+## Function Overriding
+
+Function overridding occurs when a derived class has a definition for one of the member functions of base class. The base class function gets __overridden__.
+
+To perform Function overriding we can use `virtual function.`
+
+## `virtual` functions
+
+A __virtual function__ is a member function that is declared in the base class using the keyword virtual and is re-defined (Overridden) in the derived class. __Virtual Functions__ are called during Run-time.
+
+### Virtual function rules
+1. Virtual functions cannot be static.
+2. A virtual function can be a friend function of another class.
+3. Virtual functions should be accessed using a pointer or reference of base class type to achieve runtime polymorphism.
+4. The prototype of virtual functions should be the same in the base as well as the derived class.
+5. Virtual functions are always defined in the base class and overridden in a derived class. It is not mandatory for the derived class to override (or re-define the virtual function), in that case, the base class version of the function is used.
+6. A class can have a __virtual destructor__ but cannot have virtual constructor.
+
+#### Example 1
+
+```c++
+class base1
+{
+public:
+    base1() { cout << "base1()\n"; }
+    ~base1() { cout << "~base1()\n"; }
+    virtual void m_fun()
+    {
+        cout << "base1 :: m_fun() :: virtual " << endl;
+    }
+    void m_fun1()
+    {
+        cout << "base1 :: m_fun1() non virtual " << endl;
+    }
+};
+class derived : public base1
+{
+public:
+    derived() { cout << "derived()\n"; }
+    ~derived() { cout << "~derived()\n"; }
+    void m_fun()
+    {
+        cout << "derived :: m_fun() non virtual " << endl;
+    }
+    void m_fun1()
+    {
+        cout << "derived :: m_fun1() virtual " << endl;
+    }
+};
+void main()
+{
+    base1 *bp = new derived();
+    bp->m_fun();
+    bp->m_fun1();
+    delete bp;
+}
+```
+
+#### Output
+
+```sh
+base1()
+derived()
+derived :: m_fun() non virtual
+base1 :: m_fun1() non virtual
+~base1()
+```
+
+#### Example 2
+
+```c++
+class base1
+{
+public:
+    base1() { cout << "base1()\n"; }
+    virtual ~base1() { cout << "~base1()\n"; }
+    virtual void m_fun()
+    {
+        cout << "base1 :: m_fun() :: virtual " << endl;
+    }
+    void m_fun1()
+    {
+        cout << "base1 :: m_fun1() non virtual " << endl;
+    }
+};
+class derived : public base1
+{
+public:
+    derived() { cout << "derived()\n"; }
+    ~derived() { cout << "~derived()\n"; }
+    void m_fun() // It becomes virtual because of parent class declaration 
+    {
+        cout << "derived :: m_fun() non virtual " << endl;
+    }
+    virtual void m_fun1()
+    {
+        cout << "derived :: m_fun1() virtual " << endl;
+    }
+};
+class mostDerived : public derived
+{
+public:
+    mostDerived() { cout << "mostDerived()\n"; }
+    ~mostDerived() { cout << "~mostDerived()\n"; }
+    void m_fun()
+    {
+        cout << "mostDerived :: m_fun() non virtual " << endl;
+    }
+    void m_fun1()
+    {
+        cout << "mostDerived :: m_fun1() non virtual " << endl;
+    }
+};
+void main()
+{
+    base1 *bp = new mostDerived();
+    derived *dp = new mostDerived();
+    bp->m_fun();
+    bp->m_fun1();
+    dp->m_fun();
+    dp->m_fun1();
+    delete dp;
+    delete bp;
+}
+```
+
+#### Output
+
+```sh
+base1()
+derived()
+mostDerived()
+base1()
+derived()
+mostDerived()
+mostDerived :: m_fun() non virtual
+base1 :: m_fun1() non virtual
+mostDerived :: m_fun() non virtual
+mostDerived :: m_fun1() non virtual
+~derived()
+~base1()
+~base1()
+```
+
+## Pure Virtual functions
+
+A Pure Virtual function is a virtual function which does not have any implementation in the __base class__. A pure virtual function is declared by assigning a `0` in the declaration. For a pure virtual function each and every derived classes must have there own definition(implementation).
+
+#### Syntax
+
+```c++
+class Test{
+    /* Other data members */
+public:
+    // Pure virtual function
+    virtual void show() = 0;
+    /* Other memebers */ 
+}
+```
+
+## Abstract Class
+
+Any class with atleast one __Pure Virtual Function__ is called a Abstract class.
+
+__Note__:
+1. For abstract class Object creatio or instantiation is not possible.
+2. If a derived class doesn't overide base class Pure virtual function then the derived class also becomes a _Abstract class_.
+3. We can create a pointer variable for abstract class which can refer to any of it's derived class.
+
+#### Example 1
+```c++
+class Base// Abstract class
+{ 
+protected:
+    int m_x;
+
+public:
+    virtual void show() = 0;
+    void display(){
+        cout << "base display() :: this = " << this << endl;
+    }
+};
+class Derived : public Base
+{
+private:
+    int m_y;
+
+public:
+    void show()
+    {
+        cout << "Derived show() this = " << this << " m_x = " << m_x << endl;
+    }
+};
+void main()
+{
+    Base *p = new Derived();
+    p->show();
+    p->display();
+}
+```
+
+#### Output
+```sh
+Derived show() this = 0x1f1760 m_x = 0
+base display() :: this = 0x1f1760
+```
+
+#### Example 2
+```c++
+class Base
+{ // Abstract class
+protected:
+    int m_x;
+
+public:
+    virtual void show() = 0;
+    void display(){
+        cout << "base display() :: this = " << this << endl;
+    }
+};
+class Derived : public Base
+{ // abstract class
+private:
+    int m_y;
+
+public:
+    virtual void show() = 0;
+};
+class MostDerived : public Derived
+{
+private:
+    int m_z;
+
+public:
+    void show()
+    {
+        cout << "MostDerived show() this = " << this << ", m_x = " << m_x << endl;
+    }
+};
+void main()
+{
+    // Base * p = new Derived(); // gives an error
+    Base *bp = new MostDerived(); 
+    bp->show();
+    bp->display();
+    Derived *dp = new MostDerived(); 
+    dp->show();
+    dp->display();
+}
+```
+
+#### Output
+```sh
+MostDerived show() this = 0xfe1760, m_x = 0
+base display() :: this = 0xfe1760
+MostDerived show() this = 0xfe1780, m_x = 0
+base display() :: this = 0xfe1780
+```
+
+## Interface Class
+
+If all the functions of a base class are Pure Virtual Functions, then the base class becomes a Interface class. (Interface Class - Implements in class diagram)
+
+> __Note__: The derived classes of a Interface class needs to define their own Pure virtual functions.
+
+#### Example
+
+```c++
+class Base // Interface class
+{
+protected:
+    int m_x;
+
+public:
+    virtual void show() = 0;
+    virtual void display() = 0;
+};
+class Derived : public Base
+{
+private:
+    int m_y;
+
+public:
+    void show()
+    {
+        cout << "Derived show() this = " << this << " m_x = " << m_x << endl;
+    }
+    void display()
+    {
+        cout << "Derived display() this = " << this << endl;
+    }
+};
+void main()
+{
+    Base *p = new Derived();
+    p->show();
+    p->display();
+}
+```
+
+#### Output
+```sh
+Derived show() this = 0xfc1760 m_x = 0
+Derived display() this = 0xfc1760
+```
+
+## Virtual function mechanisms
+### Virtual Table (VTABLE) and Virtual Pointer (VPTR)
+
+__VTABLE__: A table of virtual function pointers, maintained per class. (`static` array of function pointers) 
+__VPTR__: A pointer to vtable, maintained per object instance which points to the VTABLE. When a new object is created, a new VPTR is insterted as a data member of that class.
+
+The `virtual` keyword tells the compiler not to perform early binding. Late binding is implemented by using the VTABLE. VTABLE is created for each class which has a virtual function.
+
+## Virtual Destructor
+Deleting a derived class object using a base class pointer that has a non-virtual destructor will result in undefined behaviour.
+
+#### Example
+Without virtual destructor.
+
+```c++
+class Base
+{
+public:
+    Base()
+    {
+        cout << "Base()" << endl;
+    }
+    ~Base()
+    {
+        cout << "~Base()" << endl;
+    }
+};
+class Derived : public Base
+{
+public:
+    Derived()
+    {
+        cout << "Derived()" << endl;
+    }
+    ~Derived()
+    {
+        cout << "~Derived()" << endl;
+    }
+};
+
+int main()
+{
+    Base *bp = new Derived();
+    delete bp;
+    return 0;
+}
+```
+
+#### Output
+
+```sh
+Base()
+Derived()
+~Base()
+```
+
+#### Example
+With virtual destructor
+
+```c++
+class Base
+{
+public:
+    Base()
+    {
+        cout << "Base()" << endl;
+    }
+    virtual ~Base()
+    {
+        cout << "~Base()" << endl;
+    }
+};
+class Derived : public Base
+{
+public:
+    Derived()
+    {
+        cout << "Derived()" << endl;
+    }
+    ~Derived()
+    {
+        cout << "~Derived()" << endl;
+    }
+};
+
+int main()
+{
+    Base *bp = new Derived();
+    delete bp;
+    return 0;
+}
+```
+
+#### Output
+```sh
+Base()
+Derived()
+~Derived()
+~Base()
+```
+
+> __Note__: If a destructor is virtual it will call the inherited class destructor as well, which properly disposes the class instances.
+
+## `friend` functions and classes
+
+A `friend` define functions and classes can access the `private` and `protected` members of any class.
+
+### Friend Functions
+- The keyword friend is placed only in the function declaration of the friend function and not in the function definition.
+- A function can declared as friend in any number of classes.
+- It possible to define the friend function a either `private` or `protected`.
+- Friend function can be invoked without the use of an object.
+
+> __Note__: Derived classes doesn't inherit friend funtions.
+
+#### Example
+```c++
+class base1
+{
+    int m_i;
+
+public:
+    base1(int arg = -1) : m_i(arg) { cout << "base1()\n"; }
+    virtual ~base1() { cout << "~base1()\n"; }
+    virtual void m_fun()
+    {
+        cout << "base1 :: m_fun() :: virtual " << endl;
+    }
+    void m_fun1()
+    {
+        cout << "base1 :: m_fun1() non virtual " << endl;
+    }
+    friend void myFndFun(base1 &); // Declaring a friend function
+};
+void myFndFun(base1 &ob)
+{
+    cout << "Friend function myFndFun() :: this :: " << &ob << ", m_i :: " << ob.m_i << endl;
+}
+int main()
+{
+    base1 obj;
+    myFndFun(obj);
+    return 0;
+}
+```
+
+#### Output
+```sh
+base1()
+this :: 0x61fdd0, m_i :: -1
+~base1()
+```
+
+## Friend classes
+
+- The friend class member functions has access to the private members defined within the class.
+- When one class is a friend of another, it only has access to memebrs defined within class. It does not inherit the other class
+- Friend class must be previously defined in an enclosing scope.
+
+#### Example 1
+```c++
+class base2;
+class base1
+{
+    int m_i;
+
+public:
+    base1(int arg = -1) : m_i(arg) { cout << "base1()\n"; }
+    virtual ~base1() { cout << "~base1()\n"; }
+    virtual void m_fun()
+    {
+        cout << "base1 :: m_fun() :: virtual " << endl;
+    }
+    void m_fun1()
+    {
+        cout << "base1 :: m_fun1() non virtual " << endl;
+    }
+    friend void myFndFun(base1 &);
+    friend class base2;
+};
+class base2
+{
+    int m_j;
+
+public:
+    base2(int arg = -1) : m_j(arg) { cout << "base2()\n"; }
+    virtual ~base2() { cout << "~base2()\n"; }
+    virtual void m_fun()
+    {
+        cout << "base2 :: m_fun() :: virtual " << endl;
+    }
+    void m_fun1()
+    {
+        cout << "base2 :: m_fun1() non virtual " << endl;
+    }
+    void baseFrndFun(base1 &obj)
+    {
+        cout << "base1 this :: " << &obj << ", m_i = " << obj.m_i << endl;
+        cout << "this :: " << this << ", m_j = " << this->m_j << endl;
+    }
+};
+void myFndFun(base1 &ob)
+{
+    cout << "Friend function myFndFun() :: this :: " << &ob << ", m_i :: " << ob.m_i << endl;
+}
+void main()
+{
+    base1 obj;
+    base2 obj2;
+    obj2.baseFrndFun(obj);
+}
+```
+
+#### Output
+```sh
+base1()
+base2()
+base1 this :: 0x61fdd0, m_i = -1
+this :: 0x61fdc0, m_j = -1
+~base2()
+~base1()
+```
+
+#### Example 2
+```c++
+class base2;
+class base1
+{
+    int m_i;
+
+public:
+    base1(int arg = -1) : m_i(arg) { cout << "base1()\n"; }
+    virtual ~base1() { cout << "~base1()\n"; }
+    virtual void m_fun()
+    {
+        cout << "base1 :: m_fun() :: virtual " << endl;
+    }
+    void m_fun1()
+    {
+        cout << "base1 :: m_fun1() non virtual " << endl;
+    }
+    friend void myFndFun(base1 &);
+};
+class derived : public base1
+{
+    int m_derived;
+
+public:
+    derived(int arg = -1) : m_derived(arg) { cout << "derived()\n"; }
+    virtual ~derived() { cout << "~derived()\n"; }
+    virtual void m_fun()
+    {
+        cout << "derived :: m_fun() :: virtual " << endl;
+    }
+    void m_fun1()
+    {
+        cout << "derived :: m_fun1() non virtual " << endl;
+    }
+    friend class base2;
+};
+class base2
+{
+    int m_j;
+
+public:
+    base2(int arg = -1) : m_j(arg) { cout << "base2()\n"; }
+    virtual ~base2() { cout << "~base2()\n"; }
+    virtual void m_fun()
+    {
+        cout << "base2 :: m_fun() :: virtual " << endl;
+    }
+    void m_fun1()
+    {
+        cout << "base2 :: m_fun1() non virtual " << endl;
+    }
+    void baseFrndFun(derived &obj)
+    {
+        cout << "derived this :: " << &obj << ", m_derived = " << obj.m_derived << endl;
+        // cout << "base 1 this :: " << this << ", base1 m_i = " << obj.m_i << endl; // Inaccessable
+        cout << "this :: " << this << ", m_j = " << this->m_j << endl;
+    }
+};
+void myFndFun(base1 &ob)
+{
+    cout << "this :: " << &ob << ", m_i :: " << ob.m_i << endl;
+}
+void main()
+{
+    derived obj(100);
+    base2 obj2;
+    obj2.baseFrndFun(obj);
+}
+```
+#### Output
+```sh
+base1()
+derived()
+base2()
+derived this :: 0x61fdd0, m_derived = 100
+this :: 0x61fdc0, m_j = -1
+~base2()
+~derived()
+~base1()
+```
+
+***
+
+***
+
+# Exceptions
+
+#include <iostream>
+#include <cstdlib>
+#include <cstdio>
+using namespace std;
+
+namespace cStyle
+{
+    double myDiv(int numerator, int denomenator) throw(int)
+    {
+        auto res = -9999;
+        if (denomenator != 0)
+        {
+            res = numerator / denomenator;
+        }
+        else
+        {
+            throw int(-1); // in C: longjmp
+        }
+
+        return res;
+    }
+}
+
+namespace cppStyle
+{
+    double myDiv(int numerator, int denomenator) throw (float) // throw(int)
+    {
+        auto res = -9999;
+        if (denomenator != 0)
+        {
+            res = numerator / denomenator;
+        }
+        else
+        {
+            // throw int(-1); // in C: longjmp
+            throw float(1.1); // in C: longjmp
+        }
+
+        return res;
+    }
+    void main()
+    {
+        try
+        {
+            cout << "myDiv(100, 10) = " << myDiv(100, 10) << "\n";
+        }
+        catch (...)
+        {
+            cout << "Exception caught..\n";
+        }
+        try
+        {
+            cout << "myDiv(100, 0) = " << myDiv(100, 0) << "\n";
+            cout << "Not executed because of exception\n";
+        }
+        catch (int err)
+        {
+            cout << "integer Exception caught = " << err << "\n";
+        }
+        catch (...)
+        {
+            cout << "Exception caught..\n";
+        }
+    }
+}
+
+namespace exceptionFamily
+{
+    class MyException
+    {
+    private:
+        int m_errno;
+
+    public:
+        MyException(int arg = -1) : m_errno(arg)
+        {
+        }
+        void what()
+        {
+            switch (m_errno)
+            {
+            case -1:
+                cout << "errno : " << m_errno << " handled \n";
+                break;
+            case -2:
+                cout << "errno : " << m_errno << " handled \n";
+                break;
+            case -3:
+                cout << "errno : " << m_errno << " handled \n";
+                break;
+            default:
+                cout << "errno : " << m_errno << " handled \n";
+                break;
+            }
+        }
+    };
+    class MyStringException : public MyException
+    {
+    private:
+        string m_errStr;
+
+    public:
+        MyStringException(string str) : m_errStr(str) {}
+    };
+    double myDiv(int numerator, int denomenator)
+    {
+        auto res = -0.0;
+        if (denomenator != 0)
+        {
+            res = numerator / denomenator;
+        }
+        else
+        {
+            // throw MyException(-1);
+            throw MyStringException("File not found!!!");
+        }
+        return res;
+    }
+    void main()
+    {
+        try
+        {
+            cout << "myDiv(100, 0) = " << myDiv(100, 0) << "\n";
+            cout << "Not executed because of exception\n";
+        }
+        catch (int err)
+        {
+            cout << "integer Exception caught = " << err << "\n";
+        }
+        catch (MyStringException err)
+        {
+            cout << "MyStringException caught..\n";
+            err.what();
+        }
+        catch (MyException err)
+        {
+            cout << "Exception caught..\n";
+            err.what();
+        }
+    }
+}
+
+namespace exceptionEx
+{
+    class Exception
+    {
+    private:
+        int x;
+    public:
+        Exception(int arg = -1) : x(arg){}
+        string what()
+        {
+            return "Number cannot be divisible by zero";
+        }
+    };
+    double myDiv(int numerator, int denomenator)
+    {
+        auto res = -0.0;
+        if (denomenator != 0)
+        {
+            res = numerator / denomenator;
+        }
+        else
+        {
+            throw Exception();
+        }
+        return res;
+    }
+    void main()
+    {
+        int x;
+        int y;
+        while (1)
+        {
+            try
+            {
+                cout<<"Enter x value :: ";
+                cin>>x;
+                cout<<"Enter y value :: ";
+                cin>>y;
+                cout<<"myDiv(x, y) : "<<myDiv(x, y)<<"\n";
+            }
+            catch (Exception e)
+            {
+                std::cerr << e.what() << '\n';
+            }
+        }
+    }
+}
+
+int main()
+{
+    // cppStyle::main();
+    // exceptionFamily::main();
+    exceptionEx::main();
+    return 0;
+}
+
+***
+
+# Named enums
+
+#include <iostream>
+
+using namespace std;
+
+void cpp98()
+{
+    enum Apple
+    {
+        green_a,
+        red_a
+    };
+    enum Orange
+    {
+        small_o,
+        big_o
+    };
+
+    Apple a = Apple::green_a;
+    Orange o = Orange::small_o;
+    if (a == o)
+    {
+        cout << "both are same\n";
+    }
+    else
+    {
+        cout << "Both are not same\n";
+    }
+}
+
+void cppModern()
+{
+    enum class Apple
+    {
+        green_a,
+        red_a
+    };
+    enum class Orange
+    {
+        small_o,
+        big_o
+    };
+
+    Apple a = Apple::green_a;
+    Orange o = Orange::small_o;
+    if (a == o) // error
+    {
+        cout<<"both are same\n";
+    }
+    else
+    {
+        cout<<"Both are not same\n";
+    }
+}
+
+int main()
+{
+    cppModern();
+}
+
+***
+
+# constexpr
+
+#include <iostream>
+using namespace std;
+
+#if 0
+
+// constexpr int gfun(int arg = -1)
+constexpr auto gfun(int arg = -1)
+{
+    if (1 == arg)
+    {
+        return 10 * 10;
+    }
+    else if (2 == arg)
+    {
+        return 20 * 20;
+    }
+    else
+    {
+        return -1;
+    }
+}
+// gives error because of different return types
+// constexpr auto gfun(int arg = -1)
+// {
+//     if (1 == arg)
+//     {
+//         return 10 * 10;
+//     }
+//     else if (2 == arg)
+//     {
+//         return 20 * 20 * 0.2;
+//     }
+//     else
+//     {
+//         return 'A';
+//     }
+// }
+
+int main()
+{
+    // constexpr auto result = 2 * 3.6 / 3.6;
+    // cout<<"typeid(result).name() = "<<typeid(result).name()<<"\n";
+    // cout<<"Result = "<<result<<"\n";
+    cout << "gfun(1)" << gfun(1) << "\n";
+    cout << "gfun(2)" << gfun(2) << "\n";
+    cout << "gfun(0)" << gfun(0) << "\n";
+}
+
+#endif
+
+template <typename T>
+constexpr auto gfun()
+{
+    if constexpr (is_integral<T>::value)
+    {
+        return 10;
+    }
+    else if constexpr (is_floating_point<T>::value)
+    {
+        return 4.5f;
+    }
+    else
+    {
+        // return 4.5f;
+        return 'A';
+    }
+}
+
+int main()
+{
+    auto val = gfun<int>();
+    cout << "val = " << val << "\n";
+    auto val1 = gfun<float>();
+    cout << "val1 = " << val1 << "\n";
+    auto val2 = gfun<char>();
+    cout << "val2 = " << val2 << "\n";
+}
+
+***
+
+# Thread barrier
+#include <thread>
+#include <barrier>
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+const int num_thread = 4;
+
+std::barrier myBarrier(num_thread);
+
+void do_work()
+{
+    cout << "Thread Id :: " << this_thread::get_id() << " working...\n";
+    myBarrier.arrive_and_wait();
+    cout << "Thread Id :: " << this_thread::get_id() << " continuing....\n";
+}
+
+int main()
+{
+    vector<thread> threads;
+    for (int i = 0; i < num_thread; i++)
+    {
+        threads.emplace_back(&do_work);
+    }
+    for (auto &thread : threads)
+    {
+        thread.join();
+    }
+}
+
+***
+
+# Atomic Counter
+
+#include <iostream>
+#include <thread>
+#include <atomic>
+#include <mutex>
+
+using namespace std;
+
+long long my_atomic_counter{0};
+
+// atomic<long long> my_atomic_counter(0); // atomic integer
+
+mutex g_mu;
+
+#define MAX 1000000
+
+
+void increment_counter()
+{
+    for (int i = 0; i < MAX; ++i)
+    {
+        g_mu.lock();
+        my_atomic_counter++;
+        g_mu.unlock();
+    }
+}
+
+int main()
+{
+    const int num_threads = 4;
+    thread threads[num_threads];
+
+    for (int i = 0; i < num_threads; i++)
+    {
+        threads[i] = thread(increment_counter);
+    }
+
+    for (int i = 0; i < num_threads; i++)
+    {
+        if (threads[i].joinable() == true)
+        {
+            threads[i].join();
+        }
+    }
+
+    cout << "my_atomic_counter = " << my_atomic_counter << "\n";
+}
+
+***
+
+# Future Shared
+#include <iostream>
+#include <mutex>
+#include <future>
+#include <chrono>
+
+using namespace std;
+
+namespace sharedPromise01
+{
+    int fact(future<int> &fRef)
+    {
+        int res = 1;
+        try
+        {
+            auto n = fRef.get();
+            for (int i = 1; i <= n; i++)
+            {
+                res *= i;
+            }
+        }
+        // catch (exception_ptr err)
+        catch (runtime_error err)
+        {
+            cout << "Exception caught error :: " << err.what() << "\n";
+        }
+        catch (...)
+        {
+            cout << "Exception caught....\n";
+        }
+        // fRef = res;
+        return res;
+    }
+
+    int main()
+    {
+        promise<int> p_obj;
+        future<int> fu = p_obj.get_future();
+        // thread th1(&fact, ref(fu));
+        auto futThread = async(launch::async, &fact, ref(fu));
+        auto futThread1 = async(launch::async, &fact, ref(fu));
+        auto futThread2 = async(launch::async, &fact, ref(fu));
+        auto futThread3 = async(launch::async, &fact, ref(fu));
+        auto futThread4 = async(launch::async, &fact, ref(fu));
+
+        p_obj.set_value(4); // promise kept
+        // Above is a broken promise
+        // this_thread::sleep_for(chrono::seconds(2));
+
+        p_obj.set_exception(make_exception_ptr(runtime_error("Broken Promise....")));
+
+        // Do main thread job
+
+        // cout << "futThread =" << typeid(futThread).name() << "\n";
+
+        // only when thread completed is required
+        cout << "futThread.get() = " << futThread.get() << "\n";
+        cout << "futThread1.get() = " << futThread1.get() << "\n";
+        cout << "futThread2.get() = " << futThread2.get() << "\n";
+        cout << "futThread3.get() = " << futThread3.get() << "\n";
+        cout << "futThread4.get() = " << futThread4.get() << "\n";
+        
+
+        return 0;
+    }
+}
+
+namespace sharedPromise02
+{
+    int fact(shared_future<int> &fRef)
+    {
+        int res = 1;
+        try
+        {
+            auto n = fRef.get();
+            for (int i = 1; i <= n; i++)
+            {
+                res *= i;
+            }
+        }
+        // catch (exception_ptr err)
+        catch (runtime_error err)
+        {
+            cout << "Exception caught error :: " << err.what() << "\n";
+        }
+        catch (...)
+        {
+            cout << "Exception caught....\n";
+        }
+        // fRef = res;
+        return res;
+    }
+
+    int main()
+    {
+        promise<int> p_obj;
+        future<int> fuObj = p_obj.get_future();
+        shared_future<int> fu = fuObj.share();
+        // thread th1(&fact, ref(fu));
+        auto futThread = async(launch::async, &fact, ref(fu));
+        auto futThread1 = async(launch::async, &fact, ref(fu));
+        auto futThread2 = async(launch::async, &fact, ref(fu));
+        auto futThread3 = async(launch::async, &fact, ref(fu));
+        auto futThread4 = async(launch::async, &fact, ref(fu));
+
+        p_obj.set_value(4); // promise kept
+        // Above is a broken promise
+
+        // p_obj.set_exception(make_exception_ptr(runtime_error("Broken Promise....")));
+
+        // Do main thread job
+
+        // only when thread completed is required
+        cout << "futThread.get() = " << futThread.get() << "\n";
+        cout << "futThread1.get() = " << futThread1.get() << "\n";
+        cout << "futThread2.get() = " << futThread2.get() << "\n";
+        cout << "futThread3.get() = " << futThread3.get() << "\n";
+        cout << "futThread4.get() = " << futThread4.get() << "\n";
+        this_thread::sleep_for(chrono::seconds(2));
+        
+        return 0;
+    }
+}
+
+int main()
+{
+    // sharedPromise01::main();
+    sharedPromise02::main();
+    return 0;
+}
+
+***
+
+# Future promise
+
+#include <iostream>
+#include <mutex>
+#include <future>
+#include <chrono>
+
+using namespace std;
+
+namespace promiseEx
+{
+    int fact(future<int> &fRef)
+    {
+        int res = 1;
+        auto n = fRef.get();
+        for (int i = 1; i <= n; i++)
+        {
+            res *= i;
+        }
+        // fRef = res;
+        return res;
+    }
+
+    // Problem sta : GEt the return value from a thread!!
+
+    int main()
+    {
+        promise<int> p_obj;
+        future<int> fu = p_obj.get_future();
+        // thread th1(&fact, ref(fu));
+        auto futThread = async(launch::async, &fact, ref(fu));
+
+        p_obj.set_value(4); // promise kept
+
+        // Do main thread job
+
+        cout << "futThread =" << typeid(futThread).name() << "\n";
+
+        // only when thread completed is required
+        cout << "futThread.get() = " << futThread.get() << "\n";
+        // cout << "fu.get() = " << fu.get() << "\n"; // error
+
+        return 0;
+    }
+}
+
+namespace brokenPromise
+{
+    int fact(future<int> &fRef)
+    {
+        int res = 1;
+        auto n = fRef.get();
+        for (int i = 1; i <= n; i++)
+        {
+            res *= i;
+        }
+        // fRef = res;
+        return res;
+    }
+
+    int main()
+    {
+        promise<int> p_obj;
+        future<int> fu = p_obj.get_future();
+        // thread th1(&fact, ref(fu));
+        auto futThread = async(launch::async, &fact, ref(fu));
+
+        // p_obj.set_value(4); // promise kept
+        // Above is a broken promise
+        this_thread::sleep_for(chrono::seconds(2));
+
+        p_obj.set_exception(make_exception_ptr(runtime_error("Broken Promise....")));
+
+        // Do main thread job
+
+        cout << "futThread =" << typeid(futThread).name() << "\n";
+
+        // only when thread completed is required
+        cout << "futThread.get() = " << futThread.get() << "\n";
+        // cout << "fu.get() = " << fu.get() << "\n"; // error
+
+        return 0;
+    }
+}
+
+namespace catchingBrokenPromise
+{
+    int fact(future<int> &fRef)
+    {
+        int res = 1;
+        try
+        {
+            auto n = fRef.get();
+            for (int i = 1; i <= n; i++)
+            {
+                res *= i;
+            }
+        }
+        // catch (exception_ptr err)
+        catch (runtime_error err)
+        {
+            cout << "Exception caught error :: " << err.what() << "\n";
+        }
+        catch (...)
+        {
+            cout << "Exception caught....\n";
+        }
+        // fRef = res;
+        return res;
+    }
+
+    int main()
+    {
+        promise<int> p_obj;
+        future<int> fu = p_obj.get_future();
+        // thread th1(&fact, ref(fu));
+        auto futThread = async(launch::async, &fact, ref(fu));
+
+        // p_obj.set_value(4); // promise kept
+        // Above is a broken promise
+        this_thread::sleep_for(chrono::seconds(2));
+
+        p_obj.set_exception(make_exception_ptr(runtime_error("Broken Promise....")));
+
+        // Do main thread job
+
+        // cout << "futThread =" << typeid(futThread).name() << "\n";
+
+        // only when thread completed is required
+        cout << "futThread.get() = " << futThread.get() << "\n";
+        // cout << "fu.get() = " << fu.get() << "\n"; // error
+
+        return 0;
+    }
+}
+
+int main()
+{
+    // promiseEx::main();
+    // brokenPromise::main();
+    catchingBrokenPromise::main();
+
+    return 0;
+}
+
+***
+
+# Future
+
+#include <iostream>
+#include <mutex>
+#include <future>
+#include <chrono>
+
+using namespace std;
+
+#if 0
+int fact(int n)
+{
+    int res = 1;
+    for (int i = 1; i <= n; i++)
+    {
+        res *= i;
+    }
+    return res;
+}
+
+int factRef(int n, int & res)
+{
+    for (int i = 1; i <= n; i++)
+    {
+        res *= i;
+    }
+    return res;
+}
+
+// Problem sta : GEt the return value from a thread!!
+
+int main()
+{
+    int res = 1;
+    thread th1(&factRef, 4, ref(res));
+    // int val = fact(4); // th1.return_value
+    // cout << "fact(4) = " << val << "\n";
+
+    // can't be possible because join() doesn't return anything
+    // if(th1.joinable()) 
+    // {
+    //     auto val = th1.join();
+    // }
+
+    if(th1.joinable()) 
+    {
+        th1.join();
+    }
+    cout << "fact(4) = " << res << "\n";
+
+    // thread th2(fact, 5);
+    // val = fact(5);
+    // cout << "fact(5) = " << val << "\n";
+
+    // thread th3(fact, 6);
+    // val = fact(6);
+    // cout << "fact(6) = " << val << "\n";
+    return 0;
+}
+
+#endif
+
+#if 0
+int fact(int n)
+// int fact(int n, future<int> & fRef)
+{
+    int res = 1;
+    for (int i = 1; i <= n; i++)
+    {
+        res *= i;
+    }
+    // fRef = res;
+    return res;
+}
+
+// Problem sta : GEt the return value from a thread!!
+
+int main()
+{
+    // future<int> fu;
+    // thread th1(&fact, 4, ref(fu));
+    auto fu = std::async(&fact, 4);
+    cout << "fu =" << typeid(fu).name() << "\n";
+
+    // Do main thread job
+
+    // only when thread completed is required
+    cout << "fu.get() = " << fu.get() << "\n";
+    // cout << "fu.get() = " << fu.get() << "\n"; // error
+    
+    return 0;
+}
+#endif 
+
+int fact(int n)
+// int fact(int n, future<int> & fRef)
+{
+    int res = 1;
+    for (int i = 1; i <= n; i++)
+    {
+        res *= i;
+    }
+    // fRef = res;
+    return res;
+}
+
+// Problem sta : GEt the return value from a thread!!
+
+int main()
+{
+    // future<int> fu;
+    // thread th1(&fact, 4, ref(fu));
+    auto fu = std::async(launch::async, &fact, 4); // forcing to create a thread and run fact
+    auto fu = std::async(launch::deferred, &fact, 4); // might run in same thread
+
+    auto fu = std::async(launch::async | launch::deferred, &fact, 4); // default
+
+    cout << "fu =" << typeid(fu).name() << "\n";
+
+    // Do main thread job
+
+    // only when thread completed is required
+    cout << "fu.get() = " << fu.get() << "\n";
+    // cout << "fu.get() = " << fu.get() << "\n"; // error
+    
+    return 0;
+}
+
+***
+
+# Spurious wake
+
+#include <iostream>
+#include <deque>
+#include <mutex>
+#include <thread>
+#include <condition_variable>
+
+using namespace std;
+
+deque<int> g_q;
+mutex g_mu;
+condition_variable g_cv;
+
+void gfun1()
+{
+    int count = 10;
+    while (count > 0)
+    {
+        unique_lock<mutex> locker(g_mu);
+        g_q.push_front(count);
+        locker.unlock();
+        g_cv.notify_one();
+        this_thread::sleep_for(chrono::seconds(1));
+        count--;
+    }
+}
+
+void gfun2()
+{
+    int data = -1;
+    while (data != 1)
+    {
+        unique_lock<mutex> locker(g_mu);
+        // g_cv.wait(locker);
+        g_cv.wait(locker, []{return g_q.empty() == false;}); // spurious wake
+        // unlocks locker and waits for notify
+        {
+            data = g_q.back();
+            g_q.pop_back();
+            locker.unlock();
+            cout << "thread - 2 got value from thread - 1 :: " << data << "\n";
+        }
+    }
+}
+
+int main()
+{
+    thread th1(&gfun1);
+    thread th2(&gfun2);
+
+    if(th1.joinable())
+    {
+        th1.join();
+    }
+    if(th2.joinable())
+    {
+        th2.join();
+    }
+}
+
+***
+
+# Condition variable
+#include <iostream>
+#include <deque>
+#include <mutex>
+#include <thread>
+#include <condition_variable>
+
+using namespace std;
+
+deque<int> g_q;
+mutex g_mu;
+condition_variable g_cv;
+
+void gfun1()
+{
+    int count = 10;
+    while (count > 0)
+    {
+        unique_lock<mutex> locker(g_mu);
+        g_q.push_front(count);
+        locker.unlock();
+        g_cv.notify_one();
+        this_thread::sleep_for(chrono::seconds(1));
+        count--;
+    }
+}
+
+void gfun2()
+{
+    int data = -1;
+    while (data != 1)
+    {
+        unique_lock<mutex> locker(g_mu);
+        g_cv.wait(locker);
+        // unlocks locker and waits for notify
+        if (g_q.empty() == false)
+        {
+            data = g_q.back();
+            g_q.pop_back();
+            locker.unlock();
+            cout << "thread - 2 got value from thread - 1 :: " << data << "\n";
+        }
+        else
+        {
+            locker.unlock();
+        }
+    }
+}
+
+int main()
+{
+    thread th1(&gfun1);
+    thread th2(&gfun2);
+
+    if(th1.joinable())
+    {
+        th1.join();
+    }
+    if(th2.joinable())
+    {
+        th2.join();
+    }
+}
+
+***
+
+# Lazy initialization
+
+#include <iostream>
+#include <thread>
+#include <mutex>
+#include <chrono>
+#include <fstream>
+using namespace std;
+
+class LogFile
+{
+    std::mutex m_mu;
+    ofstream m_file;
+
+public:
+    LogFile()
+    {
+        // m_file.open("log.txt"); // if any exception is occured file resource remained open
+    }
+    ~LogFile()
+    {
+        if (m_file)
+        {
+            m_file.close();
+        }
+    }
+    void shared_print(string msg, int val)
+    {
+        std::lock_guard<std::mutex> lg(m_mu);
+        if(m_file.is_open() == false) // lazy initialization
+        {
+            this_thread::sleep_for(chrono::seconds(5));
+            m_file.open("log.txt");
+            m_file<<"File opened\n";
+        }
+        else
+        {
+            m_file<<"File already opened\n";
+        }
+        m_file << "From" << msg << " : " << val << "\n";
+    }
+};
+
+class Functor
+{
+    LogFile &m_logFile;
+
+public:
+    Functor(LogFile &ref) : m_logFile(ref)
+    {
+    }
+    void operator()()
+    {
+        for (auto i = 0; i > -100; i--)
+        {
+            m_logFile.shared_print(" Thread ", i);
+        }
+    }
+};
+
+int main()
+{
+    LogFile logFile;
+    thread th((Functor(logFile)));
+    for (auto i = 0; i < 100; i++)
+    {
+        logFile.shared_print(" Main ", i);
+    }
+
+    // Check for thread
+    if(th.joinable() == true)
+    {
+        th.join();
+    }
+}
+
+***
+# Dead lock example
+
+#include <iostream>
+#include <thread>
+#include <mutex>
+#include <chrono>
+using namespace std;
+
+class LogFile
+{
+    std::mutex m_mu1;
+    std::mutex m_mu2;
+
+public:
+    void shared_print1(string msg, int val)
+    {
+        std::lock_guard<std::mutex> lg1(m_mu1);
+        this_thread::sleep_for(chrono::seconds(3));
+        std::lock_guard<std::mutex> lg2(m_mu2);
+        cout << "From" << msg << " : " << val << "\n";
+    }
+    void shared_print2(string msg, int val)
+    {
+        // Dead lock scenarios
+        
+        // std::lock_guard<std::mutex> lg1(m_mu2);
+        // this_thread::sleep_for(chrono::seconds(3));
+        // std::lock_guard<std::mutex> lg2(m_mu1);
+        
+        // Solution : maintain same order of locking of mutexes 
+        std::lock_guard<std::mutex> lg2(m_mu1);
+        this_thread::sleep_for(chrono::seconds(3));
+        std::lock_guard<std::mutex> lg1(m_mu2);
+        cout << "From" << msg << " : " << val << "\n";
+    }
+};
+
+void th_fun(LogFile &ref)
+{
+    for (auto i = 0; i < 100; i++)
+    {
+        ref.shared_print1(" Thread ", i);
+    }
+}
+
+int main()
+{
+    LogFile logFile;
+    thread th(th_fun, ref(logFile));
+    for (auto i = 0; i < 100; i++)
+    {
+        logFile.shared_print2(" Main ", i);
+    }
+
+    // Check for thread
+    if (th.joinable() == true)
+    {
+        th.join();
+    }
+}
+
+***
+
+# Threads
+#include <iostream>
+#include <thread>
+#include <chrono>
+using namespace std;
+
+namespace threads01
+{
+    void gfun()
+    {
+        cout << "\t\t---gfun called--------\n";
+    }
+
+    int main()
+    {
+        // cout<<"std::thread::hardware_concurrency() = " << std::thread::hardware_concurrency()<<"\n";
+        thread th(&gfun); // thread-starts
+        cout << "main :: \n";
+        cout << "main :: waiting for child thread...\n";
+        if (th.joinable() == true)
+        {
+            cout << "\tth is joinable\n";
+            th.join();
+        }
+        else
+        {
+            cout << "\tth is not joinable\n";
+        }
+        if (th.joinable() == true)
+        {
+            cout << "\tth is joinable\n";
+            th.join();
+        }
+        else
+        {
+            cout << "\tth is not joinable\n";
+        }
+        // th.join(); // don't join already cleared thread
+        cout << "main :: child thread terminate...\n";
+        return 0;
+    }
+}
+
+namespace threads02
+{
+    void gfun()
+    {
+        cout << "\t---gfun called--------\n";
+        cout << "\tchild thread :: this_thread::get_id() = " << this_thread::get_id() << "\n";
+    }
+
+    int main()
+    {
+        thread th(gfun); // thread-starts
+        cout << "main :: this_thread::get_id() = " << this_thread::get_id() << "\n";
+        if (th.joinable())
+        {
+            th.join();
+        }
+        return 0;
+    }
+}
+
+namespace threads03
+{
+    void gfun()
+    {
+        cout << "\t\t---gfun called--------\n";
+        cout << "\t\tchrono::seconds(5)\n";
+        this_thread::sleep_for(chrono::seconds(5));
+        cout << "\t\tchild thread :: this_thread::get_id() = " << this_thread::get_id() << "\n";
+    }
+
+    int main()
+    {
+        thread th(gfun); // thread-starts
+        cout << "main :: this_thread::get_id() = " << this_thread::get_id() << "\n";
+        if (th.joinable())
+        {
+            th.join();
+        }
+        return 0;
+    }
+}
+
+namespace threads04TryCatch
+{
+    void gfun()
+    {
+        cout << "\t\t---gfun called--------\n";
+        cout << "\t\tchrono::seconds(5)\n";
+        this_thread::sleep_for(chrono::seconds(5));
+        cout << "\t\tchild thread :: this_thread::get_id() = " << this_thread::get_id() << "\n";
+    }
+
+    int main()
+    {
+        thread th(gfun); // thread-starts
+        cout << "main :: this_thread::get_id() = " << this_thread::get_id() << "\n";
+        try
+        {
+            th.join();
+            this_thread::sleep_for(chrono::seconds(5));
+            cout << "\t\tchild thread :: this_thread::get_id() = " << this_thread::get_id() << "\n";
+            th.join();
+        }
+        catch (...)
+        {
+            cout << "Thread already deleted...\n";
+        }
+
+        return 0;
+    }
+}
+
+namespace threads05
+{
+    void gfun()
+    {
+        cout << "\t---gfun called--------\n";
+        cout << "\tchrono::seconds(5)\n";
+        this_thread::sleep_for(chrono::seconds(5));
+        cout << "\tchild thread :: this_thread::get_id() = " << this_thread::get_id() << "\n";
+    }
+    void main()
+    {
+        thread th1(&gfun);
+        thread th2(&gfun);
+        thread th3(&gfun);
+        thread th4(&gfun);
+
+        if (th1.joinable())
+        {
+            th1.join();
+        }
+        if (th2.joinable())
+        {
+            th2.join();
+        }
+        if (th3.joinable())
+        {
+            th3.join();
+        }
+        if (th4.joinable())
+        {
+            th4.join();
+        }
+        thread th6(gfun);
+        if (th6.joinable())
+        {
+            th6.join();
+        }
+    }
+}
+
+namespace threads06
+{
+    void gfun()
+    {
+        cout << "\t---gfun called--------\n";
+        cout << "\tchrono::seconds(5)\n";
+        this_thread::sleep_for(chrono::seconds(5));
+        cout << "\tchild thread :: this_thread::get_id() = " << this_thread::get_id() << "\n";
+    }
+    void main()
+    {
+        thread th(&gfun);
+
+        auto tid = th.get_id();
+
+        cout << "main : tid = " << tid << "\n";
+        // th becomes a deamon-process. Once detached, permanently delete
+        th.detach();
+
+        if (th.joinable())
+        {
+            th.join();
+        }
+    }
+}
+
+namespace threads07
+{
+    void gfun()
+    {
+        cout << "\t---gfun called--------\n";
+        cout << "\tchrono::seconds(5)\n";
+        this_thread::sleep_for(chrono::seconds(2));
+        cout << "\tchild thread :: this_thread::get_id() = " << this_thread::get_id() << "\n";
+    }
+    void main()
+    {
+        thread th(&gfun);
+
+        auto tid = th.get_id();
+
+        // check if thread is detached before joinable, then how to thread safe?
+
+        // Solution 3: RAII
+        class Wrapper
+        {
+            std::thread &m_thread;
+
+        public:
+            Wrapper(std::thread &t) : m_thread(t) {}
+            ~Wrapper()
+            {
+                if (m_thread.joinable())
+                {
+                    m_thread.join();
+                }
+            }
+        };
+        Wrapper w(th); // RAII
+        for (auto i = 0; i < 10000; i++)
+        {
+            cout << "from main () :: " << i << "\n";
+            if (i == 2000)
+            {
+                throw int(-1);
+            }
+        }
+
+        /*
+            // Solution 2: try-catch
+            try
+            {
+                for (auto i = 0; i < 10000; i++)
+                {
+                    cout << "from main () :: " << i << "\n";
+                    if (i % 6145 == 0)
+                    {
+                        throw int(-1);
+                    }
+                }
+            }
+            catch (...)
+            {
+                if (th.joinable())
+                {
+                    th.join();
+                }
+            }
+            // Solution 1:
+            if (th.joinable())
+            {
+                th.join();
+            }
+        */
+    }
+}
+
+namespace threads08
+{
+    class Functor
+    {
+    public:
+        void operator()()
+        {
+            for (int i = 0; i > -100; i--)
+            {
+                cout << "Functor :: i = " << i << "\n";
+            }
+        }
+    };
+    void main()
+    {
+        std::thread th((Functor()));
+        for (int i = 0; i < 100; i++)
+        {
+            cout << "Main :: i = " << i << "\n";
+        }
+        if (th.joinable())
+        {
+            th.join();
+        }
+    }
+}
+
+namespace threads09
+{
+    class Functor
+    {
+    public:
+        void operator()(string &msg)
+        {
+            cout << "From functor thread :: msg = " << msg << "\n";
+        }
+    };
+    void main()
+    {
+        string str = "hello";
+        // std::thread th((Functor()), std::move(str));
+        std::thread th((Functor()), std::ref(str));
+        cout << "From Main thread :: str = " << str << "\n";
+        if (th.joinable())
+        {
+            th.join();
+        }
+    }
+}
+
+namespace threads10
+{
+    class Functor
+    {
+    public:
+        void operator()(string &msg)
+        {
+            cout << "From functor thread :: msg = " << msg << "\n";
+            msg = "world....";
+        }
+    };
+    void main()
+    {
+        string str = "hello";
+        cout << "From Main thread :: str = " << str << "\n";
+        std::thread th((Functor()), std::ref(str));
+        if (th.joinable())
+        {
+            th.join();
+        }
+        cout << "From Main thread :: str = " << str << "\n";
+    }
+}
+
+namespace threads11
+{
+    class Functor
+    {
+    public:
+        void operator()(string &msg)
+        {
+            cout << "From functor thread :: msg = " << msg << "\n";
+            cout << "\tchrono::seconds(2)\n";
+            this_thread::sleep_for(chrono::seconds(2));
+            msg = "world....";
+        }
+    };
+    void main()
+    {
+        string str = "hello";
+        cout << "From Main thread :: str = " << str << "\n";
+        std::thread th((Functor()), std::ref(str));
+        th.detach();
+        // cout<<"chrono::sleep(5)\n";
+        // this_thread::sleep_for(chrono::seconds(5));
+        if (th.joinable())
+        {
+            th.join();
+        }
+        cout << "From Main thread :: str = " << str << "\n";
+    }
+}
+
+namespace threads12
+{
+    void gfun()
+    {
+        for (auto i = 0; i > -100; i--)
+        {
+            cout << "\tThread :: " << i << "\n";
+        }
+    }
+    void main()
+    {
+        std::thread th(&gfun);
+        for (auto i = 0; i < 100; i++)
+        {
+            cout << "main :: " << i << "\n";
+        }
+        if (th.joinable())
+        {
+            th.join();
+        }
+    }
+}
+
+
+
+int main()
+{
+    // threads01::main();
+    // threads02::main();
+    // threads03::main();
+    // threads04TryCatch::main();
+    threads05::main();
+    // threads06::main();
+    // threads07::main();
+    // threads08::main();
+    // threads09::main();
+    // threads10::main();
+    // threads11::main();
+    // threads12::main();
+    return 0;
+}
+
+***
+
+# Mutex
+
+#include <iostream>
+#include <thread>
+#include <mutex>
+using namespace std;
+
+namespace mutex01
+{
+    mutex mu;
+    void g_print(string msg, int val)
+    {
+        mu.lock();
+        cout << msg << val << "\n";
+        mu.unlock();
+    }
+    void gfun()
+    {
+        for (auto i = 0; i > -50; i--)
+        {
+            g_print("\tThread :: ", i);
+        }
+    }
+    void main()
+    {
+        std::thread th(&gfun);
+        for (auto i = 0; i < 50; i++)
+        {
+            g_print("Main :: ", i);
+        }
+        if (th.joinable())
+        {
+            th.join();
+        }
+    }
+}
+
+namespace mutex02
+{
+    mutex mu;
+    void g_print(string msg, int val)
+    {
+        lock_guard<mutex> lg(mu);
+        // mu.lock();
+        cout << msg << val << "\n";
+        // mu.unlock();
+    } // lg.~lock_gaurd() => mu.unlock();
+    void gfun()
+    {
+        for (auto i = 0; i > -50; i--)
+        {
+            g_print("\tThread :: ", i);
+        }
+    }
+    void main()
+    {
+        std::thread th(&gfun);
+        for (auto i = 0; i < 50; i++)
+        {
+            g_print("Main :: ", i);
+        }
+        if (th.joinable())
+        {
+            th.join();
+        }
+    }
+}
+
+int main()
+{
+    // mutex01::main();
+    mutex02::main();
+    return 0;
+}
+
+***
+
+# CRTP
+
+#include <iostream>
+
+using namespace std;
+
+#if 0 
+struct Base{
+    virtual void m_vfun()
+    {
+        cout<<"Base :: m_fun\n";
+    }
+    void m_fun()
+    {
+        m_vfun();
+    }
+};
+
+struct Derived : Base{
+    virtual void m_vfun()
+    {
+        cout<<"Derived :: m_fun\n";
+    }
+};
+
+int main()
+{
+    Derived obj;
+    obj.m_fun();
+}
+
+#endif
+
+#if 0
+struct Base
+{
+    void m_vfun()
+    {
+        cout << "Base :: m_fun\n";
+    }
+    void m_fun();
+};
+
+struct Derived : Base
+{
+    void m_vfun()
+    {
+        cout << "Derived :: m_fun\n";
+    }
+};
+
+void Base::m_fun()
+{
+    (static_cast<Derived *>(this))->m_vfun();
+}
+
+int main()
+{
+    Derived obj;
+    obj.m_fun();
+}
+
+#endif
+
+template <typename T>
+struct Base
+{
+    void m_vfun()
+    {
+        cout << "Base :: m_fun\n";
+    }
+    void m_funStatic()
+    {
+        (static_cast<T *>(this))->m_vfun();
+    }
+    void m_funReinterpret()
+    {
+        (reinterpret_cast<T *>(this))->m_vfun();
+    }
+};
+
+struct Derived : Base<Derived> // CRTP => Curiously Recursive Template Pattern - hierarchiral inheritance
+{
+    void m_vfun()
+    {
+        cout << "Derived :: m_fun\n";
+    }
+};
+
+int main()
+{
+    Derived obj;
+    obj.m_funStatic();
+    obj.m_funReinterpret();
+}
+
+
+***
+# Uniform initialization
+
+#include <iostream>
+#include <bits/stdc++.h>
+
+using namespace std;
+
+/*
+    Three ways of Initialization
+    ----------------------------
+    1. Abstract Initialization (Byte by byte copy - heavy computation)
+    2. Constructor ouverloading
+    3. Initializer list
+
+    preference order is from
+    3 -> 2 -> 1
+*/
+
+struct sB
+{
+    int first;
+    double second;
+} aObj = {10, 1.2}; // abstract - initialization
+
+struct sA
+{
+    int first;
+    double second;
+
+    sA(initializer_list<int> i) {} // Initalizer list
+
+    sA(int f, double s) : first(f), second(s) {} // Constructor overloading
+};
+
+int main()
+{
+    sA aObj2(40, 1.2);
+    sA aObj3{1, 2, 3, 4, 5, 6};
+    int i{10};
+    std::vector<int> vec{1, 2, 3, 4, 5};
+    std::map<std::string, int> map{{"one", 1}, {"two", 2}};
+    int arr[]{1, 2, 3, 4, 5};
+    bool flag{false};
+    int x{};     // x is initialized to 0
+    double pi{}; // pi is initialized to 0.0
+    bool flagVal{}; // flag is initialized to false
+    // int x{3.14};     // Error: narrowing conversion from double to int
+}
+
+
+***
+
+# Smart pointers
+
+#include <iostream>
+#include <bits/stdc++.h>
+
+using namespace std;
+
+namespace uniquePtr
+{
+    class cA
+    {
+    private:
+        int m_i;
+
+    public:
+        cA(int x = -1) : m_i(x)
+        {
+            cout << "cA::Cons\n";
+        }
+        ~cA()
+        {
+            cout << "~cA::Des\n";
+        }
+        void display() const
+        {
+            cout << "cA::display: this = " << this << ", m_i = " << m_i << "\n";
+        }
+    };
+    /*
+        template <typename T>
+        class unique_ptr
+        {
+            t* m_p;
+        public:
+            unique_ptr(T * p = nullptr) : m_p (p){}
+            ~unique_ptr()
+            {
+                if(m_p)
+                    delete m_p;
+            }
+            unique_ptr(const T &rhs) = delete;
+            unique_ptr & operator = (const T &rhs) = delete;
+        };
+    */
+    void Ex01()
+    {
+        cA *ap = new cA();
+        // Creating a unique ptr for raw ptr ap
+        unique_ptr<cA> up1(ap);
+        cout << "up1 = " << up1.get() << "\n";
+        // Other way of creating unique_ptr
+        unique_ptr<cA> up2(new cA());
+        // Moving the ownership of the ap ptr
+        unique_ptr<cA> up3(std::move(up1));
+        cout << "up1 = " << up1.get() << "\n"; // will get nullptr
+        cout << "up2 = " << up2.get() << "\n";
+        cout << "up3 = " << up3.get() << "\n";
+    }
+    void Ex02()
+    {
+        cA *ap = new cA();
+        unique_ptr<cA> up1(ap);
+    }
+    void Ex03()
+    {
+        auto up1 = make_unique<cA>();
+        cout << "up1 = " << up1.get() << "\n";
+        up1->display();
+    }
+    void ex04()
+    {
+        vector<unique_ptr<cA>> objs;
+        objs.push_back(unique_ptr<cA>(new cA(1)));
+        objs.push_back(unique_ptr<cA>(new cA()));
+        objs.push_back(unique_ptr<cA>(new cA()));
+        objs.push_back(unique_ptr<cA>(new cA()));
+
+        // unique_ptr is passed by reference, if we pass by value instead
+        // then compiler will throw error because unique_ptr copy consttuctor
+        // is deleted.
+        for (const auto &obj : objs)
+        {
+            obj->display();
+        }
+    }
+    namespace uniquePtrClass
+    {
+        class cB
+        {
+        public:
+            void display() const
+            {
+                cout << "cB :: display() :: this = " << this << endl;
+            }
+            ~cB()
+            {
+                cout << "~cB() :: this = " << this << endl;
+            }
+        };
+        class cA
+        {
+        private:
+            unique_ptr<cB> bObj;
+
+        public:
+            // Using make_unique
+            cA() : bObj(make_unique<cB>()) {}
+            void makeCb()
+            {
+                bObj->display();
+            }
+            ~cA()
+            {
+                cout << "~cA() :: this = " << this << ", bObj = " << bObj.get() << endl;
+            }
+        };
+        void main()
+        {
+            cA obj;
+            obj.makeCb();
+        }
+    }
+    void makeUniqueEx2()
+    {
+        // Create a unique_ptr to an array of 5 integers.
+        auto p = make_unique<int[]>(5);
+        // Initialize the array.
+        for (int i = 0; i < 5; ++i)
+        {
+            p[i] = i;
+            wcout << p[i] << " ";
+        }
+    }
+    void uniquePtr_vs_makeUnique()
+    {
+        unique_ptr<cA> up1(new cA(1));
+        auto up2 = make_unique<cA>(10);
+        up1->display();
+        up2->display();
+    }
+    void main()
+    {
+        // Ex01();
+        // Ex03();
+        // ex04();
+        // uniquePtrClass::main();
+        // makeUniqueEx2();
+        uniquePtr_vs_makeUnique();
+    }
+}
+
+namespace sharedPtr
+{
+    /*
+        template <typename T>
+        class shared_ptr
+        {
+            struct{
+                T * m_p;
+                unsigned int ref_count;
+            }resource;
+        public:
+            shared_ptr() : resource.m_p(nullptr), resource.ref_count(0){}
+            shared_ptr(T * p) : resource.m_p(p), resource.ref_count(1){}
+            ~shared_ptr()
+            {
+                if(resource.m_p)
+                {
+                    resource.ref_count--;
+                    if(resource.ref_count <= 0)
+                    {
+                        delete resource.m_p;
+                    }
+                }
+            }
+            unsigned int use_count() {return resource.ref_count;}
+            shared_ptr(shared_ptr && rhs)
+            {
+                if(rhs.resource.m_p)
+                {
+                    this->resource.m_p = rhs.resource.m_p;
+                    this->resource.ref_count = rhs.resource.ref_count;
+                }
+            }
+        };
+    */
+    // Common declaration for below examples
+    class cA
+    {
+    private:
+        int m_i;
+
+    public:
+        cA(int x = -1) : m_i(x)
+        {
+            cout << "cA::Cons\n";
+        }
+        ~cA()
+        {
+            cout << "~cA::Des\n";
+        }
+        void display() const
+        {
+            cout << "cA::display: this = " << this << ", m_i = " << m_i << "\n";
+        }
+    };
+    void Ex01()
+    {
+        cA obj1(10);
+        // Passing obj address
+        shared_ptr<cA> sp1(&obj1);
+        cout << "sp1 = " << sp1 << "\n";
+        // Using new expression to create an object
+        shared_ptr<cA> sp2(new cA(20));
+        cout << "sp2 = " << sp2 << "\n";
+        // using make_shared
+        auto sp3 = make_shared<cA>(30);
+        cout << "sp3 = " << sp3 << "\n";
+        // Using nullptr when initialization must be separate from declaration
+        shared_ptr<cA> sp4(nullptr);
+        // Equivalent to :: shared_ptr<cA> sp4;
+        sp4 = make_shared<cA>(40);
+        cout << "sp4 = " << sp4 << "\n";
+        sp1->display();
+        cout << "sp1.use_count = " << sp1.use_count() << "\n";
+    }
+    void Ex02()
+    {
+        shared_ptr<cA> sp1(new cA());
+        cout << "sp1 = " << sp1 << "\n";
+        sp1->display();
+        cout << "sp1.use_count = " << sp1.use_count() << "\n";
+        shared_ptr<cA> sp2(sp1);
+        cout << "sp2 = " << sp2 << "\n";
+        sp2->display();
+        cout << "sp2.use_count = " << sp2.use_count() << "\n";
+    }
+
+    void Ex03()
+    {
+        shared_ptr<cA> sp1(new cA(10));
+        cout << "sp1.use_count = " << sp1.use_count() << "\n";
+        // Creating a shared_ptr using copy cons
+        // Increments ref_count
+        auto sp2(sp1);
+        cout << "sp1.use_count = " << sp1.use_count() << "\n";
+        // Creating a shared_ptr using assignment operator
+        // Increments ref_count
+        auto sp3 = sp1;
+        cout << "sp1.use_count = " << sp1.use_count() << "\n";
+        // Moving ownership using move semantics
+        cout << "Moving ownership\n";
+        shared_ptr<cA> sp4(std::move(sp1));
+        // sp1 becomes zero and sp4 becomes 3
+        cout << "sp1.use_count = " << sp1.use_count() << "\n";
+        cout << "sp4.use_count = " << sp4.use_count() << "\n";
+
+        // Swapping of shared_ptr's - swaps resource and ref count
+        auto sp5 = make_shared<cA>(20);
+        cout << "sp5.use_count = " << sp5.use_count() << "\n";
+        cout << "sp4.use_count = " << sp4.use_count() << "\n";
+        cout << "Swapping\n";
+        sp5.swap(sp4);
+        cout << "sp5.use_count = " << sp5.use_count() << "\n";
+        cout << "sp4.use_count = " << sp4.use_count() << "\n";
+    }
+
+    void Ex04()
+    {
+        auto sp = make_shared<cA>();
+        cout << "sp = " << sp << "\n";
+        sp->display();
+    }
+
+    void Ex05()
+    {
+        auto sp = make_shared<cA>();
+        cout << "sp = " << sp << "\n";
+        cout << "typeid(sp).name() = " << typeid(sp).name() << "\n";
+        sp->display();
+        weak_ptr<cA> wp(sp);
+        if (wp.expired())
+        {
+            cout << "Expired...\n";
+        }
+        else
+        {
+            cout << "Not expired..\n";
+        }
+        sp->~cA();
+        if (wp.expired())
+        {
+            cout << "Expired...\n";
+        }
+        else
+        {
+            cout << "Not expired..\n";
+        }
+    }
+
+    void shared_ptr_bool_exp_ex()
+    {
+        auto obj1 = new cA(10);
+        auto obj2 = new cA(10);
+
+        // create shared_ptr
+        shared_ptr<cA> sp1(obj1);
+        shared_ptr<cA> sp2(obj2);
+
+        cout << "sp1 == sp2 :: " << boolalpha << (sp1 == sp2) << endl;
+        cout << "sp1 < sp2 :: " << boolalpha << (sp1 < sp2) << endl;
+        cout << "sp1 > sp2 :: " << boolalpha << (sp1 > sp2) << endl;
+
+        // Create a related shared_ptr
+        shared_ptr<cA> sp3(sp2);
+        cout << "sp3 == sp2 :: " << boolalpha << (sp3 == sp2) << endl;
+    }
+
+    void main()
+    {
+        // Ex01();
+        // Ex02();
+        // Ex03(); // Handing over of ownership
+        // Ex04();
+        // Ex05();
+        shared_ptr_bool_exp_ex();
+    }
+}
+
+namespace weakPtr
+{
+    class cA
+    {
+    private:
+        int m_i;
+
+    public:
+        cA(int x = -1) : m_i(x)
+        {
+            cout << "cA::Cons\n";
+        }
+        ~cA()
+        {
+            cout << "~cA::Des\n";
+        }
+        void display() const
+        {
+            cout << "cA::display: this = " << this << ", m_i = " << m_i << "\n";
+        }
+    };
+    void Ex01()
+    {
+        weak_ptr<cA> wp;
+        {
+            auto sp = make_shared<cA>();
+            wp = sp;
+            cout << "sp = " << sp << "\n";
+            if (wp.expired())
+            {
+                cout << "expired...\n";
+            }
+            else
+            {
+                cout << "Not expired...\n";
+            }
+            sp->display();
+            cout << "sp.use_count() = " << sp.use_count() << "\n";
+        }
+        if (wp.expired())
+        {
+            cout << "expired...\n";
+        }
+        else
+        {
+            cout << "Not expired...\n";
+        }
+    }
+    void Ex02()
+    {
+        cA *ap = new cA();
+        // weak_ptr<cA> wp(ap); // error
+        // weak_ptr<cA> wp (make_unique<cA>()); // error
+        weak_ptr<cA> wp(make_shared<cA>());
+    }
+    void main()
+    {
+        Ex01();
+    }
+}
+
+int main()
+{
+    // uniquePtr::main();
+    // sharedPtr::main();
+    weakPtr::main();
+    return 0;
+}
+
+***
+
+# Tie
+
+#include <iostream>
+#include <bits/stdc++.h>
+using namespace std;
+
+class cA
+{
+private:
+    int m_id;
+    double m_sal;
+    string m_name;
+
+public:
+    cA(int id, double sal, string name) : m_id(id), m_sal(sal), m_name(name) {}
+    bool operator<(const cA &rhs) const
+    {
+        return tie(this->m_id, this->m_name, this->m_sal) < tie(rhs.m_id, rhs.m_name, rhs.m_sal);
+    }
+};
+
+int main()
+{
+    cA c1(1000, 60000, "Pradeep");
+    cA c2(1000, 60000, "Ravi");
+    if (c1 < c2)
+    {
+        cout << "c1 is less than c2\n";
+    }
+    else
+    {
+        cout << "c2 is less than c1\n";
+    }
+    return 0;
+}
+
+***
+
+# Tuples
+#include <iostream>
+#include<tuple>
+using namespace std;
+
+int main()
+{
+    std::tuple<int, double, string> tObj(10, 4.5, "Hi");
+    cout << "get<0>(tObj) = " << get<0>(tObj) << "\n";
+    cout << "get<0>(tObj) = " << get<1>(tObj) << "\n";
+    cout << "get<0>(tObj) = " << get<2>(tObj) << "\n";
+    return 0;
+}
+
+***
+
+# Static assert
+#include<iostream>
+
+using namespace std;
+
+// template <class T>
+// void f(T v)
+// {
+//     static_assert(sizeof(v) == 4, "v must have sizeof 4 bytes");
+// }
+
+void f(int16_t v)
+{
+    static_assert(sizeof(v) == 2, "v must have sizeof 4 bytes");
+    // static_assert(sizeof(v) != 2, "v must have sizeof 2 bytes");
+}
+
+void f(int32_t v)
+{
+    static_assert(sizeof(v) == 4, "v must have sizeof 4 bytes");
+    // static_assert(sizeof(v) != 4, "v must have sizeof 4 bytes");
+}
+
+void f(int64_t v)
+{
+    static_assert(sizeof(v) == 8, "v must have sizeof 4 bytes");
+    // static_assert(sizeof(v) != 8, "v must have sizeof 8 bytes");
+}
+
+void f(int8_t v)
+{
+    static_assert(sizeof(v) == 1, "v must have sizeof 4 bytes");
+    // static_assert(sizeof(v) != 1, "v must have sizeof 1 bytes");
+}
+
+int main()
+{
+    int64_t v64; // 8 bytes
+    f(v64);
+    int32_t v32; // 4 bytes
+    f(v32);
+    int16_t v16; // 2 bytes
+    f(v16);
+    int8_t v8; // 1 bytes
+    f(v8);
+    return 0;
+}
+
+***
+
+# User defined literals
+
+#include <iostream>
+
+using namespace std;
+
+constexpr long double operator""_deg(long double deg)
+{
+    return deg * 3.141592 / 180;
+}
+
+constexpr auto operator""_cm(unsigned long long mm)
+{
+    return mm/10;
+}
+
+int main()
+{
+    auto val = 100.1_deg;
+    cout<<"val = "<< val<<"\n";
+    auto mycm = 1000_cm;
+    cout<<"mycm = "<< mycm<<"\n";
+    return 0;
+}
+
+
+***
+
+# Raw strings
+#include<iostream>
+
+using namespace std;
+
+int main()
+{
+    string text = R"(First Line\n Second Line\n Third Line\n)";
+    cout<<text<<"\n";
+    string text1 = "(First Line\n Second Line\n Third Line\n)";
+    cout<<text1<<"\n";
+}
+
+***
+# Variadic Templates
+
+#include <iostream>
+#include <cstdio>
+#include <cstdarg>
+
+using namespace std;
+
+namespace cStyle
+{
+    void MyPrintf(const char *fmt, ...)
+    {
+        va_list al; // #define va_list (void*) // #define va_list (char *)
+        int ival = -1;
+        char *cp = nullptr;
+        va_start(al, fmt);
+        // al = &fmt + 1
+        for (; *fmt; ++fmt)
+        {
+            if (*fmt != '%')
+            {
+                printf("%c", *fmt);
+            }
+            else
+            {
+                switch (*++fmt)
+                {
+                case 'd':
+                    ival = va_arg(al, int);
+                    /*
+                       ival = *((int *) al); // typecast and then derefer
+                       al = (int *) al + 1;
+                    */
+                    printf("%d", ival);
+                    break;
+                case 's':
+                    cp = va_arg(al, char *);
+                    for (; *cp; cp++)
+                    {
+                        printf("%c", *cp);
+                    }
+                    break;
+                }
+            }
+        }
+        va_end(al);
+        // al = NULL
+    }
+
+    int main()
+    {
+        MyPrintf("int: %d, string: %s\n", 10, "Hello world");
+        return 0;
+    }
+}
+
+namespace VariadicTemplates // C++ 11
+{
+    template <typename First>
+    void print_list(First first)
+    {
+        cout << "one arg left \n";
+        cout << first << "\n";
+    }
+
+    template <typename First, typename... Rest>
+    void print_list(First first, Rest... Args)
+    {
+        cout << first << ", ";
+        print_list(Args...);
+    }
+
+    int main()
+    {
+        print_list(45, "Hello", 5.6, 'A', "Hello", " world");
+        return 0;
+    }
+}
+
+namespace VariadicTemplatesCpp14
+{
+
+    template <typename... Rest>
+    void print_list(Rest... Args)
+    {
+        // cout << ...Args << ", ";
+        // print_list(Args...);
+    }
+
+    int main()
+    {
+        print_list(45, "Hello", 5.6, 'A');
+        return 0;
+    }
+}
+
+int main()
+{
+    VariadicTemplates::main();
+    // VariadicTemplatesCpp14::main();
+    return 0;
+}
+
+***
+
+# Member pointers
+
+#include <iostream>
+using namespace std;
+
+struct sA
+{
+    int x, y;
+    sA() : x(10), y(20) {}
+    void m_fun1()
+    {
+        cout << "m_fun1\n";
+    }
+    void m_fun2()
+    {
+        cout << "m_fun2\n";
+    }
+};
+
+int main()
+{
+    int sA::*mptr; // stores only offset
+    sA obj;
+    sA *ap = &obj;
+    mptr = &sA::y;
+
+    cout << "obj.*mptr = " << obj.*mptr << "\n";
+    cout << "ap->*mptr = " << ap->*mptr << "\n";
+
+    void (sA::*mFnPtr)();
+
+    mFnPtr = &sA::m_fun1;
+    (ap->*mFnPtr)();
+    (obj.*mFnPtr)();
+
+    mFnPtr = &sA::m_fun2;
+    (ap->*mFnPtr)();
+    (obj.*mFnPtr)();
+    return 0;
+}
+
+***
+# Modern Cpp
+#include <iostream>
+
+#include <vector>
+#include <algorithm>
+
+using namespace std;
+
+namespace lambda
+{
+    void ex01()
+    {
+        vector<int> v = {10, 20, 30, 40, 50, 20, 60, 20, 70};
+        int a = 20;
+        auto cnt = count_if(v.begin() + 2, v.end(), [&a](int x)
+                            { return x == a; });
+        cout << "cnt = " << cnt << "\n";
+    }
+    void ex01Auto()
+    {
+        vector<int> v = {10, 20, 30, 40, 50, 20, 60, 20, 70};
+        int a = 20;
+        auto cnt = count_if(v.begin(), v.end(), [&a](auto x)
+                            { return x == a; });
+        cout << "cnt = " << cnt << "\n";
+    }
+    void ex02()
+    {
+        int x = 4;
+        int y = 5;
+        int a;
+        auto z = [=]() mutable
+        {
+            x = 3;
+            ++y;
+            int w = x + y;
+            return w;
+        };
+        cout << "x = " << x << ", y = " << y << "\n";
+        a = z();
+        cout << "a = " << a << "\n";
+        cout << "x = " << x << ", y = " << y << "\n";
+        a = z();
+        cout << "a = " << a << "\n";
+        cout << "x = " << x << ", y = " << y << "\n";
+        a = z();
+        cout << "a = " << a << "\n";
+        cout << "x = " << x << ", y = " << y << "\n";
+    }
+    void main()
+    {
+        ex01();
+        ex01Auto();
+        ex02();
+    }
+}
+
+namespace Function
+{
+    int sum(int x, int y)
+    {
+        return x + y;
+    }
+    void ex01()
+    {
+        // std::function<int(int, int)> fsum = &sum;
+    }
+    void ex03()
+    {
+        struct Foo
+        {
+            void f(int i)
+            {
+                cout << " FOO :: f : this = " << this << ", i = " << i << "\n";
+            }
+        };
+        Foo foo;
+    }
+    void main()
+    {
+    }
+}
+
+namespace DelegatingConstructor
+{
+    void Ex01()
+    {
+        struct sA
+        {
+            sA()
+            {
+                cout << "1st level configuration, this = " << this << "\n";
+            }
+            sA(int i) : sA() // c++ fails, c++ yes
+            {
+                // cout<<"1st level configuration\n"; // DRY fails
+                // sA(); // c++ fails
+                cout << "2st level configuration, this = " << this << "\n";
+            }
+        } obj(1);
+    }
+    void Ex02()
+    {
+        struct sA
+        {
+            sA()
+            {
+                cout << "1st level configuration, this = " << this << "\n";
+            }
+            sA(int i) : sA() // c++ fails, c++ yes
+            {
+                // cout<<"1st level configuration\n"; // DRY fails
+                // sA(); // c++ fails
+                cout << "2nd level configuration, this = " << this << "\n";
+            }
+        } obj(1);
+    }
+    void main()
+    {
+        Ex01();
+    }
+}
+
+namespace keywords
+{
+    void overrideEx01()
+    {
+        struct Base
+        {
+            virtual void m_fun()
+            {
+                cout << "Base :: m_fun\n";
+            }
+        };
+        struct Derived : Base
+        {
+            // void m_fun(int x) override
+            void m_fun() override
+            {
+                cout << "Derived :: m_fun\n";
+            }
+        };
+        Base *bp = new Derived();
+        bp->m_fun();
+        // bp->m_fun(1);
+    }
+    void overrideEx02()
+    {
+        struct Base
+        {
+            virtual void m_fun()
+            {
+                cout << "Base :: m_fun\n";
+            }
+        };
+        struct Derived : Base
+        {
+            // void m_fun(int x) override
+            void m_fun() override
+            {
+                cout << "Derived :: m_fun\n";
+            }
+        };
+        struct MostDerived : Derived
+        {
+            void m_fun() override
+            {
+                cout << "MostDerived :: m_fun\n";
+            }
+        };
+        Base *bp = new MostDerived();
+        bp->m_fun();
+    }
+    void finalEx01()
+    {
+        struct Base
+        {
+            virtual void m_fun()
+            {
+                cout << "Base :: m_fun\n";
+            }
+        };
+        struct Derived : Base
+        {
+            void m_fun() final
+            {
+                cout << "Derived :: m_fun\n";
+            }
+        };
+        struct MostDerived : Derived
+        {
+            /* // error can't override final function
+            void m_fun() override
+            {
+                cout << "MostDerived :: m_fun\n";
+            }
+            */
+        };
+        Base *bp = new MostDerived();
+        bp->m_fun();
+    }
+    void finalEx02()
+    {
+        struct Base
+        {
+            virtual void m_fun()
+            {
+                cout << "Base :: m_fun\n";
+            }
+        };
+        struct Derived : Base
+        {
+            void m_fun() final override
+            {
+                cout << "Derived :: m_fun\n";
+            }
+        };
+        struct MostDerived : Derived
+        {
+            /* // error can't override final function
+            void m_fun() override
+            {
+                cout << "MostDerived :: m_fun\n";
+            }
+            */
+        };
+        Base *bp = new MostDerived();
+        bp->m_fun();
+    }
+    void finalEx03()
+    {
+        struct Base
+        {
+            virtual void m_fun() final
+            {
+                cout << "Base :: m_fun\n";
+            }
+        };
+        struct Derived : Base
+        {
+            // void m_fun() final override
+            // {
+            //     cout << "Derived :: m_fun\n";
+            // }
+        };
+        struct MostDerived : Derived
+        {
+            /* // error can't override final function
+            void m_fun() override
+            {
+                cout << "MostDerived :: m_fun\n";
+            }
+            */
+        };
+        Base *bp = new MostDerived();
+        bp->m_fun();
+    }
+    void defaultEx01()
+    {
+        struct sA
+        {
+            sA() = default; // compiler to special member function
+            // Rule of 3
+            void operator=(const sA &rhs) {}
+            sA(const sA &rhs) {} // Copy cons
+            ~sA() {}
+            // rule of 5
+            void operator=(const sA &&rhs) {} // move assignment
+            sA(const sA &&rhs) {}             // move cons
+        };
+    }
+    void deleteEx01()
+    {
+        struct Base
+        {
+            void m_fun()
+            {
+                cout << "Base :: m_fun\n";
+            }
+            void m_fun1(int x)
+            {
+                cout << "Base :: m_fun , x = " << x << "\n";
+            }
+            void m_fun2(int x, int y)
+            {
+                cout << "Base :: m_fun , x = " << x << ", y = " << y << "\n";
+            }
+        };
+        struct Derived : Base
+        {
+            void m_fun1(int) = delete;
+            // void m_fun() final override
+            // {
+            //     cout << "Derived :: m_fun\n";
+            // }
+            void operator=(Derived const &rhs) = delete;
+        };
+
+        Derived obj;
+        obj.m_fun();
+        // obj.m_fun1(1); // error
+        obj.m_fun2(2, 3);
+        Derived obj2;
+        // obj = obj2; // error
+    }
+    void main()
+    {
+        // overrideEx01();
+        // overrideEx02();
+        // finalEx01();
+        // finalEx02();
+        // finalEx03();
+        deleteEx01();
+    }
+}
+
+int main()
+{
+    // lambda::main();
+    // Function::main();
+    // DelegatingConstructor::main();
+    keywords::main();
+}
+
+
+***
+
+# Shallow copy and Deep Copy
+
+#include <iostream>
+using namespace std;
+
+namespace ShallowCopyEx01
+{
+    class cA
+    {
+    private:
+        int m_i;
+
+    public:
+        cA(int arg = -1) : m_i(arg)
+        {
+            cout << "cA : Default/Single cons: this = " << this << "\n";
+        }
+        cA(cA &copyObjRef) // if not present complier creates a copy cons and copies byte by byte
+        {
+            cout << "cA : copy cons: this = " << this << "\n";
+            this->m_i = copyObjRef.m_i;
+        }
+        ~cA()
+        {
+            cout << "~cA : Des : this = " << this << "\n";
+        }
+    };
+    void main()
+    {
+        cA obj1(10);
+
+        cA cloneObj(obj1);
+    }
+}
+
+namespace DeepCopyEx01
+{
+#define MAX 100
+    class cA
+    {
+    private:
+        int m_arr[MAX];
+
+    public:
+        cA()
+        {
+            cout << "cA : Default/Single cons: this = " << this << "\n";
+            for (int i = 0; i < MAX; i++)
+            {
+                m_arr[i] = 1000 + i;
+            }
+        }
+        ~cA()
+        {
+            cout << "~cA : Des : this = " << this << "\n";
+            for (int i = 0; i < MAX; i++)
+            {
+                cout << m_arr[i] << " ";
+            }
+            cout << "\n";
+        }
+        cA(cA &rhs)
+        {
+            cout << "cA : Copy cons : this = " << this << "\n";
+            for (int i = 0; i < MAX; i++)
+            {
+                this->m_arr[i] = rhs.m_arr[i]; // Deep - Copy
+            }
+        }
+    };
+    void main()
+    {
+        cA obj1;
+        cA cloneObj(obj1);
+    }
+}
+
+namespace ShallowCopyEx02
+{
+#define MAX 100
+    class cA
+    {
+    private:
+        int *m_arr;
+
+    public:
+        cA()
+        {
+            cout << "cA : Default/Single cons: this = " << this << "\n";
+            try
+            {
+                m_arr = new int[MAX];
+            }
+            catch (...)
+            {
+                cout << "Low memeory...\n";
+            }
+
+            for (int i = 0; i < MAX; i++)
+            {
+                m_arr[i] = 1000 + i;
+            }
+        }
+        ~cA()
+        {
+            cout << "~cA : Des : this = " << this << "\n";
+            for (int i = 0; i < MAX; i++)
+            {
+                cout << m_arr[i] << " ";
+            }
+            cout << "\n";
+            if (m_arr != nullptr)
+            {
+                delete[] m_arr;
+            }
+        }
+        cA(cA &rhs)
+        {
+            cout << "cA : Copy cons : this = " << this << "\n";
+            // Deep - Copy
+            cout << "m_arr[0] = " << &m_arr[0] << endl;
+            for (int i = 0; i < MAX; i++)
+            {
+                this->m_arr[i] = rhs.m_arr[i];
+            }
+
+            // Shallow copy
+            // this->m_arr = rhs.m_arr;
+        }
+    };
+    void main()
+    {
+        cA obj1;
+        cA cloneObj(obj1);
+    }
+}
+
+namespace DeepShallowEx02
+{
+#define MAX 100
+    class cA
+    {
+    private:
+        int *m_arr;
+
+    public:
+        cA()
+        {
+            cout << "cA : Default/Single cons: this = " << this << "\n";
+            try
+            {
+                m_arr = new int[MAX];
+            }
+            catch (...)
+            {
+                cout << "Low memeory...\n";
+            }
+
+            for (int i = 0; i < MAX; i++)
+            {
+                m_arr[i] = 1000 + i;
+            }
+            for (int i = 0; i < MAX; i++)
+            {
+                cout << m_arr[i] << " ";
+            }
+            cout << "\n";
+        }
+        ~cA()
+        {
+            cout << "~cA : Des : this = " << this << "\n";
+            for (int i = 0; i < MAX; i++)
+            {
+                cout << m_arr[i] << " ";
+            }
+            cout << "\n";
+            if (m_arr != nullptr)
+            {
+                delete[] m_arr;
+            }
+        }
+        cA(cA &rhs)
+        {
+            cout << "cA : Copy cons : this = " << this << "\n";
+            try
+            {
+                rhs.m_arr = new int[MAX];
+            }
+            catch (...)
+            {
+                cout << "Low memeory...\n";
+            }
+            // Deep - Copy
+            for (int i = 0; i < MAX; i++)
+            {
+                this->m_arr[i] = rhs.m_arr[i];
+            }
+            // Shallow copy
+            // this->m_arr = rhs.m_arr;
+        }
+    };
+    void main()
+    {
+        cA obj1;
+        cA cloneObj(obj1);
+    }
+}
+
+namespace CopyConstructor04
+{
+#define MAX 100
+    class cA
+    {
+    private:
+        int *m_arr;
+
+    public:
+        cA()
+        {
+            cout << "cA : Default/Single cons: this = " << this << "\n";
+            try
+            {
+                m_arr = new int[MAX];
+            }
+            catch (...)
+            {
+                cout << "Low memeory...\n";
+            }
+
+            for (int i = 0; i < MAX; i++)
+            {
+                m_arr[i] = 1000 + i;
+            }
+        }
+        ~cA()
+        {
+            cout << "~cA : Des : this = " << this << "\n";
+            if (m_arr != nullptr)
+            {
+                for (int i = 0; i < MAX; i++)
+                {
+                    cout << m_arr[i] << " ";
+                }
+                cout << "\n";
+                delete[] m_arr;
+            }
+            else
+            {
+                cout << "Object without resource\n";
+            }
+        }
+        // cA(const cA &rhs)
+        cA(cA &rhs)
+        {
+            cout << "cA : Copy cons : this = " << this << "\n";
+            // Shallow copy
+            this->m_arr = rhs.m_arr;
+            rhs.m_arr = nullptr; // Moving-ownership
+        }
+    };
+    void main()
+    {
+        cA obj1;
+        cA cloneObj(obj1);
+    }
+}
+
+namespace MoveConstructor
+{
+#define MAX 100
+    class cA
+    {
+    private:
+        int *m_arr;
+
+    public:
+        cA()
+        {
+            cout << "cA : Default/Single cons: this = " << this << "\n";
+            try
+            {
+                m_arr = new int[MAX];
+            }
+            catch (...)
+            {
+                cout << "Low memeory...\n";
+            }
+
+            for (int i = 0; i < MAX; i++)
+            {
+                m_arr[i] = 1000 + i;
+            }
+        }
+        ~cA()
+        {
+            cout << "~cA : Des : this = " << this << "\n";
+            if (m_arr != nullptr)
+            {
+                for (int i = 0; i < MAX; i++)
+                {
+                    cout << m_arr[i] << " ";
+                }
+                cout << "\n";
+                delete[] m_arr;
+            }
+            else
+            {
+                cout << "Object without resource\n";
+            }
+        }
+        cA(const cA &rhs)
+        {
+            cout << "cA : Copy cons : this = " << this << "\n";
+            // Shallow copy
+            this->m_arr = rhs.m_arr;
+            // rhs.m_arr = nullptr; // Moving-ownership
+        }
+        cA(cA &&rhs) // Move constrcutor
+        {
+            cout << "cA : Mov cons : this = " << this << "\n";
+            // Shallow copy
+            this->m_arr = rhs.m_arr;
+            rhs.m_arr = nullptr; // Moving-ownership
+        }
+    };
+    void main()
+    {
+        // cA cloneObj(cA()); // Created and handover resource and get deleted
+        cA obj1;
+        cA cloneObj(std::move(obj1)); // using move schemantics
+        cout << "&cloneObj = " << &cloneObj << "\n";
+    }
+}
+
+namespace MoveConstructor01
+{
+#define MAX 100
+    class cA
+    {
+    private:
+        int *m_arr;
+
+    public:
+        cA()
+        {
+            cout << "cA : Default/Single cons: this = " << this << "\n";
+            try
+            {
+                m_arr = new int[MAX];
+            }
+            catch (...)
+            {
+                cout << "Low memeory...\n";
+            }
+
+            for (int i = 0; i < MAX; i++)
+            {
+                m_arr[i] = 1000 + i;
+            }
+        }
+        ~cA()
+        {
+            cout << "~cA : Des : this = " << this << "\n";
+            if (m_arr != nullptr)
+            {
+                cout << "Deleting resources..." << endl;
+                delete[] m_arr;
+            }
+            else
+            {
+                cout << "Object without resource\n";
+            }
+        }
+        cA(const cA &rhs)
+        {
+            cout << "cA : Copy cons : this = " << this << "\n";
+            // Shallow copy
+            this->m_arr = rhs.m_arr;
+            // rhs.m_arr = nullptr; // Moving-ownership
+        }
+        cA(cA &&rhs) // Move constrcutor
+        {
+            cout << "cA : Mov cons : this = " << this << "\n";
+            // Shallow copy
+            this->m_arr = rhs.m_arr;
+            rhs.m_arr = nullptr; // Moving-ownership
+        }
+    };
+    void main()
+    {
+        cA cloneObj(std::move(cA())); // Created and handover resource and get deleted
+        // cA obj1;
+        // cA cloneObj(std::move(obj1)); // using move schemantics
+        cout << "&cloneObj = " << &cloneObj << "\n";
+    }
+}
+
+namespace deepCopyExample
+{
+#define MAX 100
+    class cA
+    {
+    private:
+        int *m_arr;
+
+    public:
+        cA()
+        {
+            cout << "cA : Default/Single cons: this = " << this << "\n";
+            try
+            {
+                m_arr = new int[MAX];
+            }
+            catch (...)
+            {
+                cout << "Low memeory...\n";
+            }
+
+            for (int i = 0; i < MAX; i++)
+            {
+                m_arr[i] = 1000 + i;
+            }
+        }
+        ~cA()
+        {
+            cout << "~cA : Des : this = " << this << "\n";
+            if (m_arr != nullptr)
+            {
+                cout << "Deleting resource" << endl;
+                delete[] m_arr;
+            }
+            else
+            {
+                cout << "Deleting resource of nullptr" << endl;
+            }
+        }
+        cA(cA &rhs)
+        {
+            cout << "cA : Copy cons : this = " << this << "\n";
+            try
+            {
+                this->m_arr = new int[MAX];
+            }
+            catch (...)
+            {
+                cout << "Low memeory...\n";
+            }
+            // Deep - Copy
+            for (int i = 0; i < MAX; i++)
+            {
+                this->m_arr[i] = rhs.m_arr[i];
+            }
+        }
+    };
+    void main()
+    {
+        cA obj1;
+        cA cloneObj(obj1);
+    }
+}
+
+int main()
+{
+    // ShallowCopyEx01::main();
+    // DeepCopyEx01::main();
+    // ShallowCopyEx02::main();
+    // DeepShallowEx02::main();
+    // CopyConstructor04::main();
+    deepCopyExample::main();
+    return 0;
+}
+
+***
+
+# Perfect forwarding
+#include<iostream>
+
+using namespace std;
+
+
+/*
+    Reference collapsing rules:
+        1. T& &arg => &
+        2. T& &&arg => &
+        3. T&& &arg => &
+        4. T&& &&arg => &&
+
+*/
+
+namespace PerfectForwarding01
+{
+    struct cA
+    {
+        void m_fun(int & lRef)
+        {
+            cout<<"void m_fun(int & lRef)\n";
+        }
+        void m_fun(int && rRef)
+        {
+            cout<<"void m_fun(int && rRef)\n";
+        }
+    }gobj;
+
+    template <typename T>
+    void gfun(T && arg) // Coined by Scott Meyers T&& => Universal reference
+    {
+        gobj.m_fun(std::forward<T&&>(arg));
+    }
+    void main()
+    {
+        int li = 10;
+        gfun(li); // Passing lvalue
+        gfun(100); // passing rvalue
+    }
+}
+
+int main()
+{
+    PerfectForwarding01::main();
+}
+
+
+***
+
+# Type Inference
+
+#include <iostream>
+
+using namespace std;
+
+namespace DeclType01
+{
+    struct lType
+    {
+        int i, j;
+    } sObj;
+
+    char gFun1() { return 'A'; }
+    void main()
+    {
+        int y = 20;
+        decltype(10) li;
+        decltype(10 * 1.1) lj;
+        decltype(gFun1()) lk;
+        decltype(gFun1() + 1) ll;
+        int &x = y;
+        decltype(x) z = y;
+        decltype(sObj) lm;
+        cout << "typeid(li).name() = " << typeid(li).name() << "\n";
+        cout << "typeid(lj).name() = " << typeid(lj).name() << "\n";
+        cout << "typeid(lk).name() = " << typeid(lk).name() << "\n";
+        cout << "typeid(ll).name() = " << typeid(ll).name() << "\n";
+        cout << "typeid(lm).name() = " << typeid(lm).name() << "\n";
+        cout << "typeid(z).name() = " << typeid(z).name() << "\n";
+        cout << "li = " << li << "\n";
+    }
+}
+
+namespace autoType01
+{
+    void main()
+    {
+        auto li = 10 * 1.1;
+        /*
+            1. Declaration
+            2. Definition
+            3. Initialization
+
+            Evaluate expression 2 times:
+                1. To infer the type
+                2. Evaluate to get data and initialize...
+        */
+        cout << "typeid(li).name() = " << typeid(li).name() << "\n";
+        cout << "li = " << li << "\n";
+    }
+}
+
+int main()
+{
+    DeclType01::main();
+    // autoType01::main();
+    return 0;
+}
+
+***
+
+# CPP
+
+1. [Operator Overloading](#operator-overloading)
+    1. [Operators that can be overloaded](#operators-that-can-be-overloaded)
+    2. [Operators that can't be overloaded](#operators-that-cant-be-overloaded)
+    3. [Rules of operator overloading](#rules-of-operator-overloading)
+    4. [Arithmetic Operators](#arithmetic-operators)
+        1. [Pre Increment (++)](#pre-increment)
+        2. [Post Increment (++)](#post-increment)
+        3. [Pre Decrement (++)](#pre-decrement)
+        4. [Post Decrement (++)](#post-decrement)
+        5. [Addition Operator with `int` (+)](#addition-operator-with-int)
+        6. [Addition Operator with `Object Reference` (+)](#addition-operator-with-object-reference)
+        7. [Substraction Operator with `Object reference` (-)](#substraction-operator-with-object-reference)
+        8. [Multiplication Operator (*)](#multiplication-operator)
+        9. [Division Operator (/)](#division-operator)
+    5. [Comparison Operators](#comparison-operators)
+        1. [Equal to operator (==)](#equal-to-operator)
+        2. [Not equal operator (!=)](#not-equal-operator)
+        3. [Greater than operator (>)](#greater-than-operator)
+        4. [Less than operator (<)](#less-than-operator)
+        5. [Greater than or equal to operator (>=)](#greater-than-or-equal-to-operator)
+        6. [Less than or equal to  operator (<=)](#less-than-or-equal-to-operator)
+    6. [Assignment Operators](#assignment-operators)
+        1. [Assignment Operator](#assignment-operator)
+        2. [Addition Assignment](#addition-assignment)
+        3. [Multiplication Assignment](#multiplication-assignment)
+    7. [cout operator](#cout-operator)
+
+# Operator Overloading
+
+Operator Overloading is a compile time polymorphism. It is an idea of giving a special meaning to existing operator without changing it's original meaning.
+
+## Operators that can be overloaded
+1. `new` `delete`
+2. (+ - * / % ^ & | ~)
+3. ! = < > += -= *= /= %= 
+4. ^= &= |= << >> >>= <<= == !=
+5. <= >= && || ++ -- ->* -> ,
+6. () []
+
+## Operators that can't be overloaded
+1. scope operator ::
+2. sizeof() operator
+3. period .
+4. ternary operator ?:
+5. typeid() operator
+
+## Rules of Operator overloading
+
+1. __Precedence__ and __associativity__ of operator cannot be changed
+2. Arity (number of operands) of operators cannot be changed
+3. Bulit-in operators can be overloaded
+4. Operators cannot be overloaded for __built-in types__. At least one operand must be a user-defined type. In C++, you cannot overload operators for built-in types like __int, float, char,__ etc., but you can overload operators if at least one of the operands is a user-defined type.
+5. Overloaded operators __cannot have default arguments__ except the function __call operator ()__ which can have default arguments.
+6. Assignment (=), subscript ([]), function call ("()"), and member selection (->) operators must be defined as member functions
+7. Some operators like (assignment)=, (address)& and comma (,) are by default overloaded.
+
+## Operator Overlading example
+
+```c++
+class Complex
+{
+private:
+    int m_real;
+    int m_img;
+
+public:
+    Complex();
+    explicit Complex(int = 0, int = 0);
+    explicit Complex(Complex &);
+    ~Complex();
+    /*
+        Getters and Setters
+    */
+    int get_M_Real(void) const;
+    int get_M_Img(void) const;
+    void set_M_Real(int realVal);
+    void set_M_Img(int imgVal);
+    Complex &operator++();
+    Complex &operator--();
+    Complex &operator--(int);
+    void operator+=(Complex &rhs);
+    void operator*=(Complex &rhs);
+    friend std::ostream &operator<<(std::ostream &os, Complex &rhs);
+    Complex &operator+(int value);
+    void operator=(Complex &rhs);
+};
+std::ostream &operator<<(std::ostream &os, Complex &rhs);
+
+void operator+(Complex &lhs, Complex &rhs);
+Complex &operator/(Complex &ref, int value);
+Complex &operator*(Complex &ref, int value);
+void operator-(Complex &lhs, Complex &rhs);
+bool operator==(Complex &lhs, Complex &rhs);
+bool operator!=(Complex &lhs, Complex &rhs);
+bool operator>=(Complex &lhs, Complex &rhs);
+bool operator>(Complex &lhs, Complex &rhs);
+bool operator<(Complex &lhs, Complex &rhs);
+bool operator<=(Complex &lhs, Complex &rhs);
+
+Complex::~Complex()
+{
+    cout << "Destrutor :: this " << this << " m_real = " << this->m_real << ", m_img = " << this->m_img << endl;
+}
+
+Complex::Complex()
+{
+    this->m_real = 0;
+    this->m_img = 0;
+}
+
+Complex::Complex(int realValue, int imgValue) : m_real(realValue), m_img(imgValue)
+{
+}
+
+Complex::Complex(Complex &ref)
+{
+    this->m_img = ref.m_img;
+    this->m_real = ref.m_real;
+}
+
+int Complex::get_M_Real(void) const
+{
+    return this->m_real;
+}
+int Complex::get_M_Img(void) const
+{
+    return this->m_img;
+}
+void Complex::set_M_Real(int realVal)
+{
+    this->m_real = realVal;
+}
+void Complex::set_M_Img(int imgVal)
+{
+    this->m_img = imgVal;
+}
+```
+
+## Arithmetic Operators
+
+## Pre Increment (++)
+
+```c++
+Complex &Complex::operator++()
+{
+    cout << "Complex & Operator ++ \n";
+    ++this->m_real;
+    return *this;
+}
+```
+
+## Post Increment (++)
+
+```c++
+Complex &Complex::operator++(int)
+{
+    cout << "Complex & Operator ++ \n";
+    this->m_real++;
+    return *this;
+}
+```
+
+## Pre Decrement (--)
+
+```c++
+Complex &Complex::operator++()
+{
+    cout << "Complex & Operator ++ \n";
+    --this->m_real;
+    return *this;
+}
+```
+
+## Post Decrement (--)
+
+```c++
+Complex &Complex::operator++(int)
+{
+    cout << "Complex & Operator ++ \n";
+    this->m_real--;
+    return *this;
+}
+```
+
+## Addition Operator with `int` (+)
+
+```c++
+Complex &Complex::operator+(int value) 
+{
+    cout << "Complex & Operator + \n";
+    this->m_real = this->m_real + value;
+    return *this;
+}
+```
+## Addition Operator with `Object Reference` (+)
+
+```c++
+void operator+(Complex &lhs, Complex &rhs)
+{
+    cout << "Complex & + Complex &\n";
+    lhs.set_M_Real(lhs.get_M_Real() + rhs.get_M_Real());
+}
+```
+
+## Substraction Operator with `Object reference` (-)
+```c++
+void operator-(Complex &lhs, Complex &rhs)
+{
+    lhs.set_M_Real(lhs.get_M_Real() - rhs.get_M_Real());
+}
+```
+
+## Multiplication Operator (*)
+```c++
+Complex &operator*(Complex &ref, int value)
+{
+    cout << "Complex & * \n";
+    ref.set_M_Real(ref.get_M_Real() * value);
+    return ref;
+}
+```
+
+## Division Operator (/)
+```c++
+Complex &operator/(Complex &ref, int value)
+{
+    cout << "Complex & / \n";
+    ref.set_M_Real(ref.get_M_Real() / value);
+    return ref;
+}
+```
+
+## Comparison Operators
+
+## Equal to operator (==)
+```c++
+bool operator==(Complex &lhs, Complex &rhs)
+{
+    if (lhs.get_M_Real() == rhs.get_M_Real())
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+```
+
+## Not equal operator (!=)
+
+```c++
+bool operator!=(Complex &lhs, Complex &rhs)
+{
+    return (lhs.get_M_Real() != rhs.get_M_Real());
+}
+```
+
+## Greater than operator (>)
+
+```c++
+bool operator>(Complex &lhs, Complex &rhs)
+{
+    return (lhs.get_M_Real() > rhs.get_M_Real());
+}
+```
+
+## Less than operator (<)
+
+```c++
+bool operator<(Complex &lhs, Complex &rhs)
+{
+    return (lhs.get_M_Real() < rhs.get_M_Real());
+}
+```
+
+## Less than or equal to operator (<=)
+
+```c++
+bool operator<=(Complex &lhs, Complex &rhs)
+{
+    return (lhs.get_M_Real() <= rhs.get_M_Real());
+}
+```
+
+## Greater than or equal to operator (>=)
+
+```c++
+bool operator>=(Complex &lhs, Complex &rhs)
+{
+    return (lhs.get_M_Real() >= rhs.get_M_Real());
+}
+```
+
+## Assignment Operators
+
+## Assignment operator (=)
+
+```c++
+void Complex::operator=(Complex &rhs)
+{
+    this->m_real = rhs.m_real;
+}
+```
+
+## Addition assignment (+=)
+
+```c++
+void Complex::operator+=(Complex &rhs)
+{
+    this->m_real += rhs.get_M_Real();
+}
+
+Complex obj1(10);
+Complex obj2(20);
+obj1 = obj2;
+/*
+    obj1 = obj2;
+    is equalent to
+    Complex :: operator = (obj1, obj2);
+*/
+```
+
+## Multiplication assignment (*=)
+
+```c++
+void Complex::operator*=(Complex &rhs)
+{
+    this->m_real *= rhs.get_M_Real();
+}
+```
+
+## `cout` operator
+
+```c++
+std::ostream &operator<<(std::ostream &os, Complex &rhs)
+{
+    os << "this : " << &rhs << ", m_real = " << rhs.get_M_Real() << ", m_img = " << rhs.get_M_Img() << "\n";
+    return os;
+}
+```
+
+***
+## Lambda functions
+
+# Callable / Functors
+
+A Callable/ Functors object is something that can be called like a function. The operator overload of `()` makes a callable.
+
+#### Example
+```c++
+class cA
+{
+    int m_i;
+
+public:
+    cA(int arg = -1) : m_i(arg)
+    {
+    }
+    void m_fun1() const
+    {
+        cout << "cA :: m_fun1: m_i = " << m_i << "\n";
+    }
+    void m_fun2() const
+    {
+        cout << "cA :: m_fun2: m_i = " << m_i << "\n";
+    }
+    void operator () (int id = 0) // Callable
+    {
+        switch (id)
+        {
+        case 1:
+            m_fun1();
+            break;
+        default:
+            m_fun2();
+            break;
+        }
+    }
+};
+int main()
+{
+    cA obj;
+    obj(1); // callable
+    obj();
+    return 0;
+}
+```
+
+#### Output
+```sh
+cA :: m_fun1: m_i = -1
+cA :: m_fun2: m_i = -1
+```
+
+# Lambda Functions (C++ 11)
+
+C++ Lambda expression allows us to define anonymous function objects (functors) which can either be used inline or passed as an argument.
+
+## Lambda parts 
+--------------
+[1] (2) 3 4 -> 5 {6}
+1. Capture
+2. Arguments
+3. const/mutable
+4. Exception throw
+5. Return type
+6. Body
+
+```c++
+int main()
+{
+    auto add = [](int x, int y) -> int
+    {
+        return x + y;
+    };
+    cout << "typeid(add).name = " << typeid(add).name() << "\n";
+    cout << "add(10,15) = " << add(10, 15) << "\n";
+    return 0;
+}
+```
+
+#### Output
+```sh
+typeid(add).name = Z4mainEUliiE_
+add(10,15) = 25
+```
+
+> __NOTE__: Lambda parts 3,4,5 can be removed it is still a valid lambda calling. We can also remove Lambda part 2, if we don't want any arguments to be passed.
+
+## Capture clause
+
+Capture clause can apture all variables that are till the lambda function.
+
+1. Capture variable by value
+
+```c++
+int main()
+{
+    int li = 100;
+    int lj = 200;
+    auto add = [li](int x, int y) -> int
+    {
+        return x + y + li;
+    };
+    cout << "add(10,15) = " << add(10, 15) << "\n";
+    return 0;
+}
+```
+
+#### Output
+```sh
+add(10,15) = 125
+```
+
+2. Capture all variables by value
+
+```c++
+int main()
+{
+    int li = 100;
+    int lj = 200;
+    auto add = [=](int x, int y) -> int
+    {
+        return x + y + li + lj;
+    };
+    cout << "add(10,15) = " << add(10, 15) << "\n";
+    return 0;
+}
+```
+
+#### Output
+```sh
+add(10,15) = 325
+```
+
+3. Capture variable by reference
+
+```c++
+int main()
+{
+    int li = 100;
+    int lj = 200;
+    cout << "li = "<< li << endl; 
+    auto add = [&](int x, int y) -> int
+    {
+        li = 10;
+        return x + y + li + lj;
+    };
+    cout << "add(10,15) = " << add(10, 15) << "\n";
+    cout << "li = "<< li << endl; 
+    return 0;
+}
+```
+
+#### Output
+```sh
+li = 100
+add(10,15) = 235
+li = 10
+```
+
+4. Capture all variables by reference
+```c++
+int main()
+{
+    int li = 100;
+    int lj = 200;
+    cout << "li = "<< li << endl; 
+    cout << "lj = "<< lj << endl; 
+    auto add = [&](int x, int y) -> int
+    {
+        li = 10;
+        lj = 20;
+        return x + y + li + lj;
+    };
+    cout << "add(10,15) = " << add(10, 15) << "\n";
+    cout << "li = "<< li << endl; 
+    cout << "lj = "<< lj << endl; 
+    return 0;
+}
+```
+
+#### Output
+```sh
+li = 100
+lj = 200
+add(10,15) = 55
+li = 10
+lj = 20
+```
+
+## Const/Mutable
+
+If we want to modify captured pass by value variables we can `mutable` in Lambda Function prototype. And modified value not gets reflected outside of lambda function.
+
+```c++
+int main()
+{
+    int li = 100;
+    int lj = 200;
+    cout << "li = "<< li << endl; 
+    cout << "lj = "<< lj << endl; 
+    auto add = [=](int x, int y) const -> int
+    {
+        li = 10;
+        lj = 20;
+        return x + y + li + lj;
+    };
+    cout << "add(10,15) = " << add(10, 15) << "\n";
+    cout << "li = "<< li << endl; 
+    cout << "lj = "<< lj << endl; 
+    return 0;
+}
+```
+
+#### Output
+```sh
+li = 100
+lj = 200
+add(10,15) = 55
+li = 100
+lj = 200
+```
+
+#### Example 1
+```c++
+int main()
+{
+    auto fun = [](){ return 56; };
+    cout << "fun() = " << fun() << endl;
+    return 0;
+}
+```
+#### Output
+```sh
+fun() = 56
+```
+
+---
+
+# Type Inference (C++ 11)
+
+Automatic deduction of datatype of an expression.
+
+## Two Types
+1. auto
+2. decltype
+
+## auto
+The `auto` keyword deduces type from its intitializer.
+
+In case of function, if the return type is auto then type will be evaluated by return type expression at run time.
+
+1. Declaration
+2. Definition
+3. Initialization
+
+### The `auto` keyword does 2 things
+1. To infer the type
+2. Evaluate to get data and initialize
+
+```c++
+int main()
+{
+    auto li = 10 * 1.1;
+    cout << "typeid(li).name() = " << typeid(li).name() << "\n";
+    cout << "li = " << li << "\n";
+    return 0;
+}
+```
+
+#### Output
+```sh
+typeid(li).name() = d
+li = 11
+```
+
+> __NOTE__:
+> 1. The variable declared with `auto` keyword should be initialized at the time of its __declaration__ only or else there will be a __compile-time error__.
+> 2. `auto` becomes `int` if a function returns an integer reference `int&`. To make it to reference type we use, `auto &`
+
+
+## decltype
+The `decltype` keyword inspects the declared type of an entity or type of an expression. `decltype` lets you extract the type from variable.
+
+```c++
+struct lType
+{
+    int i, j;
+} sObj;
+
+char gFun1() { return 'A'; }
+void main()
+{
+    int y = 20;
+    decltype(10) li;
+    decltype(10 * 1.1) lj;
+    decltype(gFun1()) lk;
+    decltype(gFun1() + 1) ll;
+    int &x = y;
+    decltype(x) z = y;
+    decltype(sObj) lm;
+    cout << "typeid(li).name() = " << typeid(li).name() << "\n";
+    cout << "typeid(lj).name() = " << typeid(lj).name() << "\n";
+    cout << "typeid(lk).name() = " << typeid(lk).name() << "\n";
+    cout << "typeid(ll).name() = " << typeid(ll).name() << "\n";
+    cout << "typeid(lm).name() = " << typeid(lm).name() << "\n";
+    cout << "typeid(z).name() = " << typeid(z).name() << "\n";
+    cout << "li = " << li << "\n";
+}
+```
+
+#### Output
+```sh
+typeid(li).name() = i
+typeid(lj).name() = d
+typeid(lk).name() = c
+typeid(ll).name() = i
+typeid(lm).name() = 5lType
+typeid(z).name() = i
+li = 32658
+```
+
+# Reference
+Reference is an alias or alternative name for an existing variable.
+- References can’t be NULL.
+- Reference must be initialized when declared.
+- Once initialized, we can’t reinitialize a reference.
+- Reference doesn’t have its own address.
+
+```c++
+int main(void)
+{
+    int i = 10;
+    int &iptr = i;
+
+    cout << "i = " << i << ", &i = " << &i << "\n";
+    cout << "iptr = " << iptr << ", &iptr = " << &iptr << "\n";
+    return 0;
+}
+```
+
+```sh
+i = 10, &i = 0x7fff4e3be57c
+iptr = 10, &iptr = 0x7fff4e3be57c
+```
+
+## Const Reference
+```c++
+void func(int x, int &ref, const int &constRef)
+{
+    x = ref + constRef;
+    ref = constRef * 10;
+    // constRef = ref + 10;// error
+}
+int main()
+{
+    int x = 10, y = 20, z = 30;
+    cout << "x = " << x << ", y = " << y << ", z = " << z << endl;
+    func(x, y, z);
+    cout << "x = " << x << ", y = " << y << ", z = " << z << endl;
+    return 0;
+}
+```
+
+```sh
+x = 10, y = 20, z = 30
+x = 10, y = 300, z = 30
+```
+
+## Array reference
+```c++
+int main()
+{
+    int arr[] = {1, 2, 3, 4, 5};
+    int (&ptr)[5] = arr;
+    for (int i = 0; i < 5; i++)
+    {
+        cout << "ptr[" << i << "] = " << ptr[i] << "\n";
+    }
+    return 0;
+}
+```
+
+```sh
+ptr[0] = 1
+ptr[1] = 2
+ptr[2] = 3
+ptr[3] = 4
+ptr[4] = 5
+```
+
+## Function parameters
+```c++
+void modify(int & ref)
+{
+    ref = ref * 10;
+}
+int main()
+{
+    int value = 5;
+    modify(value);
+    cout<<value<<endl;
+    return 0;
+}
+```
+
+## Function return type
+
+```c++
+int arr[] = {1, 2, 3, 4, 5};
+int& getElement(int index)
+{
+    return arr[index];
+}
+int main()
+{
+    getElement(2) = 30;
+    for(int i : arr)
+    {
+        cout << i << " ";
+    }
+    return 0;
+}
+```
+
+```sh
+1 2 30 4 5 
+```
+
+> __NOTE__: Returning reference to local variables is dangerous and should be avoided. Reference of static variables can be returned.
+
+## Reference to pointer
+Let’s assume that you want to change the pointer to point to another variable in a function. See below example.
+
+```c++
+int global_Var = 42; 
+// function to change pointer value 
+void changePointerValue(int* pp) 
+{ 
+    pp = &global_Var; 
+} 
+int main() 
+{ 
+    int var = 23; 
+    int* ptr_to_var = &var; 
+    cout << "Passing Pointer to function:" << endl; 
+    cout << "Before :" << *ptr_to_var << endl; // display 23 
+    changePointerValue(ptr_to_var); 
+    cout << "After :" << *ptr_to_var << endl; // display 23 
+    return 0; 
+}
+```
+
+```sh
+Passing Pointer to function:
+Before :23
+After :23
+```
+
+We can resolve this issue by two ways
+1. Pointer to pointer (Double pointer)
+2. Reference Pointer
+
+### Poinnter to pointer
+```c++
+int global_var = 42; 
+// function to change pointer to pointer value 
+void changePointerValue(int** ptr_ptr) 
+{ 
+    *ptr_ptr = &global_var; 
+} 
+int main() 
+{ 
+    int var = 23; 
+    int* pointer_to_var = &var; 
+    cout << "Passing a pointer to a pointer to function " << endl; 
+    cout << "Before :" << *pointer_to_var << endl; // display 23 
+    changePointerValue(&pointer_to_var); 
+    cout << "After :" << *pointer_to_var << endl; // display 42 
+    return 0; 
+} 
+```
+
+```sh
+Passing a pointer to a pointer to function 
+Before :23
+After :42
+```
+
+### Reference pointer
+```c++
+int gobal_var = 42; 
+// function to change Reference to pointer value 
+void changeReferenceValue(int*& pp)  // IMP
+{ 
+    pp = &gobal_var; 
+} 
+int main() 
+{ 
+    int var = 23; 
+    int* ptr_to_var = &var; 
+    cout << "Passing a Reference to a pointer to function" << endl; 
+    cout << "Before :" << *ptr_to_var << endl; // display 23 
+    changeReferenceValue(ptr_to_var); 
+    cout << "After :" << *ptr_to_var << endl; // display 42 
+    return 0; 
+} 
+```
+
+## LValue 
+Anything that is stored and can be addressable is called l-value. 
+__Examples__: variable names, arrays elements, const expressions, bit-fields, unions, class members.
+
+## RValue
+Anything that is stored and cannot be addressable is called r-value
+__Examples__: literals, function calls that return a nonreference type and temporary objects that are created during expression evaluation and can be accessed only by the compiler.
+
+# LValue and RValue reference (C++ 11)
+## LValue reference
+LValue Reference can bind to existing __lvalues__. They could also bind to rvalues but only when the reference variable is declared as __constant__. The syntax for L value reference is same as regular reference variable __(Datatype&)__. 
+
+## RValue reference
+RValue Reference can only bind to __rvalues__. RValue reference can modify the value of rvalues which means reference variable need not to be constant. A rvalue reference is declared with two ampersands instead of one (Datatype&&).  
+
+```c++
+int main()
+{
+    int x = 10;
+    int& lref1 = x; // lvalue reference to lvalue
+    const int& lref2 = 15; //lvalue reference to rvalue
+    int&& rref = 20; //rvalue reference to rvalue
+    rref = 100;
+    x = 200;
+    cout<<x<<" "<<lref1<<" "<<lref2<<" "<<rref;
+    return 0;
+}
+```
+
+RValue reference has potentially two usecases
+1. Move semantics
+2. Perfect Forwarding
+
+## Perfect Forwarding
+
+Perfect forwarding reduces the need for overloaded functions and helps avoid forwarding problem. The forwarding problem can occur when we write a generic function that takes references as a parameter. Consider below example.
+
+```c++
+struct cA
+{
+    void m_fun(int & lRef)
+    {
+        cout<<"void m_fun(int & lRef)\n";
+    }
+    void m_fun(int && rRef)
+    {
+        cout<<"void m_fun(int && rRef)\n";
+    }
+}gobj;
+
+template <typename T>
+void gfun(T && arg) // Coined by Scott Meyers T&& => Universal reference
+{
+    gobj.m_fun(arg);
+}
+
+void main()
+{
+    int li = 10;
+    gfun(li); // Passing lvalue
+    gfun(100); // passing rvalue
+}
+```
+
+#### Output
+```sh
+void m_fun(int & lRef)
+void m_fun(int & lRef)
+```
+
+#### Expected Output
+```sh
+void m_fun(int & lRef)
+void m_fun(int && rRef)
+```
+
+We solve above problem by using `std::forward` semantic.
+
+```c++
+struct cA
+{
+    void m_fun(int & lRef)
+    {
+        cout<<"void m_fun(int & lRef)\n";
+    }
+    void m_fun(int && rRef)
+    {
+        cout<<"void m_fun(int && rRef)\n";
+    }
+}gobj;
+
+template <typename T>
+void gfun(T && arg) // Coined by Scott Meyers T&& => Universal reference
+{
+    gobj.m_fun(std::forward<T&&>(arg));
+}
+void main()
+{
+    int li = 10;
+    gfun(li); // Passing lvalue
+    gfun(100); // passing rvalue
+}
+```
+
+#### Output
+```sh
+void m_fun(int & lRef)
+void m_fun(int && rRef)
+```
+
+## Reference collapsing rules
+|Arg|Converted to|
+|----|----|
+|T& &arg| &|
+|T& &&arg| &|
+|T&& &arg| &|
+|T&& &&arg| &&|
+
+***
+## Callables
+
+#include <iostream>
+
+using namespace std;
+
+namespace Callable01
+{
+    class cA
+    {
+        int m_i;
+
+    public:
+        cA(int arg = -1) : m_i(arg)
+        {
+        }
+        void m_fun1() const
+        {
+            cout << "cA :: m_fun1: m_i = " << m_i << "\n";
+        }
+    };
+    void main()
+    {
+        cA obj;
+        obj.m_fun1();
+    }
+}
+
+namespace Callable02
+{
+    class cA
+    {
+        int m_i;
+
+    public:
+        cA(int arg = -1) : m_i(arg)
+        {
+        }
+        void m_fun1() const
+        {
+            cout << "cA :: m_fun1: m_i = " << m_i << "\n";
+        }
+        void m_fun2() const
+        {
+            cout << "cA :: m_fun2: m_i = " << m_i << "\n";
+        }
+        void call(int id)
+        {
+            switch (id)
+            {
+            case 1:
+                m_fun1();
+                break;
+            case 2:
+                m_fun2();
+                break;
+            }
+        }
+    };
+    void main()
+    {
+        cA obj;
+        obj.call(1);
+        obj.call(2);
+    }
+}
+
+namespace Callable03
+{
+class cA
+{
+    int m_i;
+
+public:
+    cA(int arg = -1) : m_i(arg)
+    {
+    }
+    void m_fun1() const
+    {
+        cout << "cA :: m_fun1: m_i = " << m_i << "\n";
+    }
+    void m_fun2() const
+    {
+        cout << "cA :: m_fun2: m_i = " << m_i << "\n";
+    }
+    void operator () (int id = 0) // Callable
+    {
+        switch (id)
+        {
+        case 1:
+            m_fun1();
+            break;
+        default:
+            m_fun2();
+            break;
+        }
+    }
+};
+int main()
+{
+    cA obj;
+    obj(1); // callable
+    obj();
+    return 0;
+}
+}
+
+int main()
+{
+    // Callable01::main();
+    // Callable02::main();
+    Callable03::main();
+    return 0;
+}
+***
+
+***
+## Operator Overloading
+/*
+    Operators that can be overloaded::
+    -------------------------------------
+        1 -> new delete
+        2 -> + - * / % ^ & | ~
+        3 -> ! = < > += -= *= /= %= 
+        4 -> ^= &= |= << >> >>= <<= == !=
+        5 -> <= >= && || ++ -- ->* -> ,
+        6 -> () []
+
+
+    Operators that cannot be overloaded::
+    --------------------------------------
+        1 -> scope operator ::
+        2 -> sizeof() operator
+        3 -> period .
+        4 -> ternary operator ?:
+        5 -> typeid() operator
+
+    Rules:
+    ----------
+        1 -> precedence and associativity of operator cannot be changed
+        2 -> Arity (number of operands) of operators cannot be changed
+        3 -> bulitin operators can be overloaded
+        4 -> Operators cannot be overloaded for built-in types only. At least one operand must be a 
+        user-defined type. In C++, you cannot overload operators for built-in types like int, float, 
+        char, etc., but you can overload operators if at least one of the operands is a user-defined type.
+        5 -> Overloaded operators cannot have default arguments except the function call operator () 
+        which can have default arguments.
+        6 -> Assignment (=), subscript ([]), function call ("()"), and member selection (->) 
+        operators must be defined as member functions
+        7 -> Some operators like (assignment)=, (address)& and comma (,) are by default overloaded.
+*/
+
+namespace Plus
+{
+    class cA
+    {
+    private:
+        int m_i;
+
+    public:
+        cA(int val = -1) : m_i(val)
+        {
+        }
+        ~cA()
+        {
+            cout << "m_i = " << m_i << "\n";
+        }
+
+        void set_m_i(int val)
+        {
+            this->m_i = val;
+        }
+
+        int get_m_i(void)
+        {
+            return m_i;
+        }
+    };
+
+    // operator overloading
+
+    void operator+(cA &lhs, int rhs)
+    {
+        lhs.set_m_i(lhs.get_m_i() + rhs);
+    }
+
+    void main()
+    {
+        cA obj1(10);
+        obj1 + 5;
+        /*
+            obj1 + 5;
+            is equalent to
+            :: operator + (obj1, 5);
+        */
+        Plus::operator+(obj1, 5);
+        cout << obj1.get_m_i() << "\n";
+    }
+}
+
+namespace BinaryMinus
+{
+    class cA
+    {
+    private:
+        int m_i;
+
+    public:
+        cA(int val = -1) : m_i(val)
+        {
+        }
+        ~cA()
+        {
+            cout << "m_i = " << m_i << "\n";
+        }
+
+        void set_m_i(int val)
+        {
+            this->m_i = val;
+        }
+
+        int get_m_i(void)
+        {
+            return m_i;
+        }
+    };
+
+    // operator overloading
+
+    void operator-(cA &lhs, int rhs)
+    {
+        lhs.set_m_i(lhs.get_m_i() - rhs);
+    }
+
+    void main()
+    {
+        cA obj1(10);
+        obj1 - 5;
+        /*
+            obj1 - 5;
+            is equalent to
+            BinaryMinus :: operator - (obj1, 5);
+        */
+        BinaryMinus::operator-(obj1, 5);
+        cout << obj1.get_m_i() << "\n";
+    }
+}
+
+namespace Multiplication
+{
+    class cA
+    {
+    private:
+        int m_i;
+
+    public:
+        cA(int val = -1) : m_i(val)
+        {
+        }
+        ~cA()
+        {
+            cout << "m_i = " << m_i << "\n";
+        }
+
+        void set_m_i(int val)
+        {
+            this->m_i = val;
+        }
+
+        int get_m_i(void)
+        {
+            return m_i;
+        }
+    };
+
+    // operator overloading
+
+    void operator*(cA &lhs, int rhs)
+    {
+        lhs.set_m_i(lhs.get_m_i() * rhs);
+    }
+
+    void main()
+    {
+        cA obj1(10);
+        obj1 * 5;
+        /*
+            obj1 * 5;
+            is equalent to
+            Multiplication :: operator * (obj1, 5);
+        */
+        Multiplication::operator*(obj1, 5);
+        cout << obj1.get_m_i() << "\n";
+    }
+}
+
+namespace Assignment
+{
+    class cA
+    {
+    private:
+        int m_i;
+
+    public:
+        cA(int val = -1) : m_i(val)
+        {
+        }
+        ~cA()
+        {
+            cout << "m_i = " << m_i << "\n";
+        }
+
+        void set_m_i(int val)
+        {
+            this->m_i = val;
+        }
+
+        int get_m_i(void)
+        {
+            return m_i;
+        }
+
+        // assignment operator member function
+        // __thiscall operator = (cA * const this, cA & rhs)
+        void operator = (cA & rhs)
+        {
+            this->m_i = rhs.m_i;
+        }
+    };
+
+    // operator overloading
+
+    /*
+        // Error needs to be a member function
+        void operator = (cA &lhs, cA &rhs)
+        {
+            lhs.set_m_i(rhs.get_m_i());
+        }
+    */
+
+    void main()
+    {
+        cA obj1(10);
+        cA obj2(20);
+        cout<<"Before assignment\n";
+        cout << obj1.get_m_i() << "\n";
+        cout << obj2.get_m_i() << "\n";
+        obj1 = obj2;
+        /*
+            obj1 = obj2;
+            is equalent to
+            Assignment :: operator = (obj1, obj2);
+        */
+        // Assignment::operator = (obj1, obj2);
+        cout<<"After assignment\n";
+        cout << obj1.get_m_i() << "\n";
+        cout << obj2.get_m_i() << "\n";
+    }
+}
+
+int main()
+{
+    // Plus::main();
+    // BinaryMinus::main();
+    // Multiplication::main();
+    Assignment::main();
+}
+
+***
+
+# Namespace
+Namespace is a declarative region that provides a scope to the identifiers(the name of types, functions, variables, classes, methods). 
+
+Namespaces are used to organize code into logical groups and to prevent name collisions that can occur especially when your code base includes multiple libraries. 
+
+```c++
+namespace myns
+{
+    int gi = 100;
+    int var = 5;
+    namespace myns_nested
+    {
+        int gi = 200;
+    }
+    void func1(void)
+    {
+        cout << "Inside func1 - myns namespace\n";
+    }
+}
+
+namespace myns01
+{
+    double var = 3.14;
+}
+
+int main(void)
+{
+    cout << "&myns gi = " << &myns::gi << "\n";
+    using namespace myns;
+    cout << "myns gi = " << gi << "\n";
+    cout << "myns_nested gi = " << myns_nested::gi << "\n";
+    int x;
+    x = var + myns01::var;
+    cout <<"sum of \"var + myns01::var\" = "<< x << endl;
+    func1();
+}
+```
+
+# `nullptr`
+
+The nullptr keyword specifies a null pointer constant of type `std::nullptr_t``, which is convertible to any raw pointer type
+
+***
+
+# Default Arguments in functions
+
+To provide default values for functions.
+
+```c++
+int sum(int x, int y, int z = 100)
+{
+    return (x + y + z);
+}
+
+int main(void)
+{
+    int x = 10;
+    int y = 20;
+    int z = 30;
+    cout<<sum(x,y,z)<<"\n";
+    cout<<sum(x,y)<<"\n";
+    return 0;
+}
+```
+## Things to know
+1. Default args must be constant (Macros allowed)
+```c++
+void fun(int x, int y = 10); //Valid
+
+void fun(int x, int y = x); // Not Valid
+```
+
+2. Declare and define
+
+```c++
+// MyHeader.h
+void fun(int x, int y = 10);
+```
+
+```c++
+// MySrc.cpp
+void fun(int x, int y){
+}
+```
+
+3. Right to left
+```c++
+void fun(int x, int y = 10); //Valid
+
+void fun(int x = 0, int y); // Not Valid
+```
+4. If a function has last parameter with default value, then the same function cannot have a overloaded function with 2 args with same datatype.
+
+```c++
+int sum(int x, int y, int z = 100)
+{
+    return (x + y + z);
+}
+
+int sum(int a, int b) // Not allowed
+{
+    return (a + b);
+}
+
+int main(void)
+{
+    int x = 10;
+    int y = 20;
+    int z = 30;
+    cout << sum(x, y, z) << "\n";
+    cout << sum(x, y) << "\n"; // error
+        //  ^ more than one instance of overloaded function "sum" matches the argument list:
+    return 0;
+}
+```
+
+***
+
+# Templates
+Templates allows user to write __generic functions__ and __classes__ that can be used for different data types.
+
+Two types
+1. Function Templates
+2. Class Templates
+
+## Function templates
+
+```c++ 
+template <typename T> T getMax(T x, T y)
+{
+    return (x > y ? x : y);
+}
+
+template <typename T> void print(T x, T y)
+{
+    cout<<"x = "<<x<<", y = "<<y<<"\n";
+}
+
+int main(void)
+{
+    int xi = 10, yi = 20;
+    double xd = 10.5, yd = 20.5;
+    cout<<getMax<int>(xi, yi) << "\n";
+    cout<<getMax<double>(xd, yd) << "\n";
+    print<int>(xi, yi);
+    return 0;
+}
+```
+
+***
+
+# OOPS
+
+## Class
+Class is a blueprint for creating objects. It is a user defined datatype that holds it's own data members and member functions. 
+
+## Object
+Object is an instance of class. When a class is defined, no memory is allocated but when it is instantiated (i.e. an object is created) memory is allocated.
+
+## Access Specifiers
+Assigns accessibility to the class members.
+
+Three types of access specifiers
+1. public
+2. private
+3. protected
+
+### `public`
+`public` data memebers can be accessed by anyone and from anywhere int the program using direct member access operator(.)
+
+### `private`
+`private` gives access to only member functions. Cannot be accessed outside class.
+
+__friend functions__ are allowed to access `private` data members.
+
+### `protected`
+Can be accessed only by sub classes(derived classes) of that class. __friend classes__ can also access.
+
+## Constructor
+A special function that gets invoked automatically at the time of object creation. It has the same name as of the class. __Contructors__ doesnot return any value.
+
+```c++
+<className>()
+{
+    // Some Instructions
+}
+
+// Define constructor outside of class
+<className>::<className>()
+{
+    // Some Instructions
+}
+```
+
+## Types of Constructors
+1. Default Constructor
+2. Parameterized Constructor
+3. Copy Constructor
+4. Move Constructor
+
+## Default Constructor
+A default constructor is a constructor that doesn’t take any argument. It has no parameters. It is also called a __zero-argument constructor__.
+
+```c++
+class cA{
+    int m_i;
+    int m_j;
+    public:
+        // Default constructor
+        cA()
+        {
+            cout<<"cA:: Default constructor - this = "<<this<<"\n";
+            this->m_i = 0;
+            this->m_j = 0;
+        }
+        void display()
+        {
+            cout<<"cA::display - this = "<< this << "\n";
+            cout<<"this->m_i = "<< this->m_i << "\n";
+            cout<<"this->m_j = "<< this->m_j << "\n";
+        }
+        // cA * const __thiscall ~cA(cA * const this)
+        ~cA()
+        {
+            cout<<"cA::~cA (desrtuctor): this = " << this <<"\n";
+        }
+};
+
+int main()
+{
+    cA obj1;
+    obj1.display();
+}
+```
+
+## Parameterized Constructor
+Passing of parameters to constructor. It is used to overload constructors. 
+
+> __Note__: When Parameterized constructor is created and no default constructor is defined explicitly, the compiler will not implicitly call the default constructor.
+
+```c++
+class cA{
+    int m_i;
+    int m_j;
+    public:
+        // Default constructor
+        cA()
+        {
+            cout<<"cA:: Default constructor - this = "<<this<<"\n";
+            this->m_i = 0;
+            this->m_j = 0;
+        }
+        // Parameterized constructor with default value
+        cA(int m_i_value, int m_j_value = -1)
+        {
+            cout<<"cA:: Parameter constructor - this = "<<this<<"\n";
+            this->m_i = m_i_value;
+            this->m_j = m_j_value;
+        }
+        void display()
+        {
+            cout<<"cA::display - this = "<< this << "\n";
+            cout<<"this->m_i = "<< this->m_i << "\n";
+            cout<<"this->m_j = "<< this->m_j << "\n";
+        }
+        // cA * const __thiscall ~cA(cA * const this)
+        ~cA()
+        {
+            cout<<"cA::~cA (desrtuctor): this = " << this <<"\n";
+        }
+};
+
+int main()
+{
+    cA obj1(10);
+    cA obj2(100, 200);
+    obj1.display();
+    obj2.display();
+}
+```
+
+## Copy Constructor
+A special member function that initiates an object using another object of the same class. A copy constructor takes reference to an object of same class as an arg.
+
+```c++
+class cA{
+    int m_i;
+    int m_j;
+    public:
+        // Default constructor
+        cA()
+        {
+            cout<<"cA:: Default constructor - this = "<<this<<"\n";
+            this->m_i = 0;
+            this->m_j = 0;
+        }
+        // Parameterized constructor
+        cA(int m_i_value, int m_j_value)
+        {
+            cout<<"cA:: Parameter constructor - this = "<<this<<"\n";
+            this->m_i = m_i_value;
+            this->m_j = m_j_value;
+        }
+        // Copy Constructor
+        cA(cA & rhs)
+        {
+            cout<<"cA:: Copy constructor - this = "<<this<<"\n";
+            this->m_i = rhs.m_i;
+            this->m_j = rhs.m_j;
+        }
+        void display()
+        {
+            cout<<"cA::display - this = "<< this << "\n";
+            cout<<"this->m_i = "<< this->m_i << "\n";
+            cout<<"this->m_j = "<< this->m_j << "\n";
+        }
+        ~cA()
+        {
+            cout<<"cA::~cA (desrtuctor): this = " << this <<"\n";
+        }
+};
+
+int main()
+{
+    cA obj1(10, 100);
+    cA cloneObj(obj1);
+    cloneObj.display();
+    obj1.display();
+}
+```
+
+## Move Constructor
+
+## Destructor
+A special function that gets invoked automatically when a object is going to be destroyed. A __destructor__ is the last function that gets called before an object is destroyed.
+
+- Destructor also has the same name that of Class. Except a tilde(~) symbol infront of it.
+- Destructor releases the memory that is occupied by object that is created by constructor.
+- In destructor, Objects are destroyed in the reverse of an object creation.
+- Not possible to define more than one destructor.
+
+```c++
+~<className>()
+{
+    // Some Instructions
+}
+
+// Define constructor outside of class
+<className>::~<className>()
+{
+    // Some Instructions
+}
+```
+
+## this
+
+The this pointer is a pointer accessible only within the nonstatic member functions of a `class`, `struct`, or `union` type. It points to the object for which the member function is called. __Static member functions__ don't have a this pointer.
+
+```c++
+class cA{
+    public:
+        int m_i; // Offset => 0
+        int m_j; // Offset => 4
+        int m_k; // Offset => 8
+
+        void m_fun1(){}
+        // g++ : void __attribute__(thiscall) m_fun1(cA * const this)
+        void m_fun2(){}
+        void m_fun3(){}
+};
+
+int main()
+{
+    cout<<"sizeof(cA) = "<< sizeof(cA) << "\n";
+
+    cA obj1, obj2;
+    cA * Aptr = nullptr;
+
+    obj1.m_i = 10; // &obj1 + offset (cA:m_i)
+
+    Aptr = &obj1;
+    cout<<"Aptr = "<<Aptr->m_i<<"\n";
+    obj1.m_fun1();
+    /*
+        push &obj1 -> this arg value
+        call cA::m_fun1(cA * const this)
+    */
+}
+```
+
+### Example for Construtor, Destructor and this
+```c++
+class cA{
+    int m_i;
+    int m_j;
+    public:
+        // Default constructor
+        // cA * const __thiscall cA(cA * const this)
+        cA()
+        {
+            cout<<"cA:: Default constructor - this = "<<this<<"\n";
+            this->m_i = 0;
+            this->m_j = 0;
+        }
+        void display()
+        {
+            cout<<"cA::display - this = "<< this << "\n";
+            cout<<"this->m_i = "<< this->m_i << "\n";
+            cout<<"this->m_j = "<< this->m_j << "\n";
+        }
+        // cA * const __thiscall ~cA(cA * const this)
+        ~cA()
+        {
+            cout<<"cA::~cA (desrtuctor): this = " << this <<"\n";
+        }
+};
+
+int main()
+{
+    cA obj1;
+    obj1.display();
+}
+```
+
+## `const` member functions
+
+Declaring a member function with the const keyword specifies that the function is a "__read-only__" function that doesn't modify the object for which it's called. 
+
+A `const` member function can't __modify any non-static data members__ or __call any non-constant member functions__.
+
+> __Note__: Static data members can be modified in `const` member functions.
+
+```c++
+class cA{
+    int m_i;
+    int m_j;
+    public:
+        // Default constructor
+        // cA * const __thiscall cA(cA * const this)
+        cA()
+        {
+            cout<<"cA:: Default constructor - this = "<<this<<"\n";
+            this->m_i = 0;
+            this->m_j = 0;
+        }
+        
+        // void __thiscall display(const cA *const this)
+        void display() const
+        {
+            cout<<"cA::display - this = "<< this << "\n";
+            cout<<"this->m_i = "<< this->m_i << "\n";
+            cout<<"this->m_j = "<< this->m_j << "\n";
+            // m_i = 500; // Gives error
+            // m_j = 1000; // Gives error
+            myfun();
+            // myfun1(); // Calling of non const memebers is not possible
+        }
+        // cA * const __thiscall ~cA(cA * const this)
+        ~cA()
+        {
+            cout<<"cA::~cA (desrtuctor): this = " << this <<"\n";
+        }
+        void myfun() const
+        {
+            cout<<"myfun()\n";
+        }
+        void myfun1()
+        {
+            cout<<"myfun1()\n";
+        }
+};
+
+int main()
+{
+    cA obj1;
+    obj1.display();
+}
+```
+
+## `mutable`
+
+`mutable` keyword can only be applied to __non-static, non-const, and non-reference__ data members of a class. 
+
+If a data member is declared mutable, then it is legal to assign a value to this data member from a const member function.
+
+```c++
+class cA{
+    int m_i;
+    mutable int m_j;
+    public:
+        // Default constructor
+        // cA * const __thiscall cA(cA * const this)
+        cA()
+        {
+            cout<<"cA:: Default constructor - this = "<<this<<"\n";
+            this->m_i = 0;
+            this->m_j = 0;
+        }
+        // void __thiscall display(const cA *const this)
+        void display() const
+        {
+            cout<<"cA::display - this = "<< this << "\n";
+            m_j = 1000; // Can change even when member is const
+            cout<<"this->m_i = "<< this->m_i << "\n";
+            cout<<"this->m_j = "<< this->m_j << "\n";
+        }
+        // cA * const __thiscall ~cA(cA * const this)
+        ~cA()
+        {
+            cout<<"cA::~cA (desrtuctor): this = " << this <<"\n";
+        }
+};
+
+int main()
+{
+    cA obj1;
+    obj1.display();
+}
+```
+
+## `static` members
+
+Classes can contain `static` member data and member functions. When a data member is declared as `static`, only one copy of the data is maintained for all objects of the class.
+
+```c++ 
+class cA
+{
+private:
+    static int gCount; // Declaration only - private to not give access to other functions
+public:
+    cA()
+    {
+        ++gCount;
+    }
+    ~cA()
+    {
+        --gCount;
+    }
+    static int getGcount(void) // Not to go with this, instead go with standard function
+    {
+        return gCount;
+    }
+};
+
+// Intitalizing static data member
+int cA::gCount = 0;
+
+int main()
+{
+    cout << " Total objects of cA: " << cA::getGcount() << "\n";
+    cA obj1;
+    cout << " Total objects of cA: " << obj1.getGcount() << "\n";
+    {
+        cA obj2;
+        cout << " Total objects of cA: " << obj1.getGcount() << "\n";
+        cout << " Total objects of cA: " << obj2.getGcount() << "\n";
+    } // obj2.~cA()
+    cout << " Total objects of cA: " << obj1.getGcount() << "\n";
+}
+```
+
+## `explicit`
+
+The `explicit` keyword is used with a constructor to prevent it from performing implicit conversions. A `explicit` constructor is marked to not convert types implicitly.
+
+### Without `explicit` keyword
+```c++
+#include <iostream>
+using namespace std;
+ 
+class Demo{
+    public:
+        Demo(int n){
+            demo1 = n;
+        }
+        int getDemo(){
+            return demo1;
+        }
+    private:
+        int demo1;
+};
+ 
+void getDemoExternally(Demo demo){
+    cout << demo.getDemo();
+}
+// Driver Code
+int main()
+{
+    getDemoExternally(10); // Object is created
+    return 0;
+}
+```
+
+### With `explicit` keyword
+```c++
+class Demo{
+    public:
+        explicit Demo(int n){
+            demo1 = n;
+            cout<<"Demo() - this = "<<this << endl;
+        }
+        int getDemo(){
+            return demo1;
+        }
+        ~Demo(){
+            cout<<"~Demo() - this = "<<this << endl;
+        }
+    private
+        int demo1;
+};
+ 
+void getDemoExternally(Demo demo){
+    cout << demo.getDemo()<<endl;
+}
+// Driver Code
+int main()
+{
+    // getDemoExternally(10); // Gives error - no suitable constructor exists to convert from "int" to "Demo"
+    getDemoExternally(Demo (10));
+    return 0;
+}
+```
+
+## Initializer-list
+The initializer list is used to directly initialize data members of a class.
+
+```c++
+class cA{
+    const int m_i;
+    int m_j;
+    public:
+        cA() : m_i(0), m_j(0)
+        {
+            cout<<"cA:: Default constructor - this = "<<this<<"\n";
+        }
+        explicit cA(int m_i_value, int m_j_value) : m_i(m_i_value), m_j(m_j_value)
+        {
+            cout<<"cA:: Parameter constructor - this = "<<this<<"\n";
+        }
+        void display() const
+        {
+            cout<<"cA::display - this = "<< this << "\n";
+            cout<<"this->m_i = "<< this->m_i << "\n";
+            cout<<"this->m_j = "<< this->m_j << "\n";
+        }
+        ~cA()
+        {
+            cout<<"cA::~cA (desrtuctor): this = " << this <<"\n";
+        }
+        
+};
+
+int main()
+{
+    cA obj1(10, 20);
+    obj1.display();
+}
+```
+
+***
+
+# Pointers
+
+A pointer is a variable that is used to store the address of a variable or an object. Three main purposes.
+1.	To allocate new objects in heap memory
+2.	To pass functions to other functions
+3.	To iterate over elements of arrays or other data structures
+
+## Const pointers
+Two types of const pointer
+1. Pointer Constant
+2. Constant Pointer
+
+### Pointer Constant
+__Value constant__ and __address changes__.
+
+#### Syntax
+
+```c++
+const int * ptr_name;
+// Or
+int const * ptr_name;
+```
+
+### Constant Pointer
+__Address constant__ and __value changes__.
+
+#### Syntax
+```c++
+int * const ptr_name;
+```
+
+## new - delete operators
+Dynamic memory allocation and deallocation of objects is done by using the new and delete operators. 
+
+The `new operator calls` special function `operator new` and `delete operator calls` special function `operator delete`.
+
+### new operator
+
+The new operator allocates memory for objects of built-in types, objects of class type that __doesn’t contain user-defined operator new__ functions, and arrays of any type. The __return type__ of new operator is always `void*(void pointer)`. It also constructs the object in the allocated memory.
+
+### delete operator
+
+Memory that is __dynamically allocated__ using __new operator__ can be freed using __delete operator__. Using delete operator also causes the __class destructor (if exists) to be called__.
+
+```c++ 
+class cA
+{
+private:
+    int m_i;
+
+public:
+    cA(int arg) : m_i(arg)
+    {
+        cout << "cA::cA: this = " << this << "\n";
+    }
+    ~cA()
+    {
+        cout << "cA::~cA: this = " << this << "\n";
+    }
+    void display() const
+    {
+        cout << "cA::display: this = " << this << " : m_i = " << m_i << "\n";
+    }
+};
+
+void main()
+{
+    cA *ptr = nullptr;
+    // Allocating memory using new operator
+    ptr = new cA(); // Constructor gets called
+    // Calling cA member display()
+    ptr->display();
+    // Deallocating memeory using delete operator
+    delete ptr; // Destructor gets called
+    cout << "ptr = " << ptr << endl;
+    ptr = nullptr; // Pointing to null
+    cout << "ptr = " << ptr << endl;
+}
+```
+
+## new - delete operator subscript []
+This type of new – delete is used for __allocating__ and __deallocating memory__ for __continuous allocation__(Array).
+
+```c++
+class cA
+{
+private:
+    int m_i;
+
+public:
+    cA(int arg = -1) : m_i(arg)
+    {
+        cout << "cA::cA: this = " << this << "\n";
+    }
+    ~cA()
+    {
+        cout << "cA::~cA: this = " << this << "\n";
+    }
+    void display() const
+    {
+        cout << "cA::display: this = " << this << " : m_i = " << m_i << "\n";
+    }
+};
+void main()
+{
+    cA *ptr = nullptr;
+    // Allocating memory using new subscript
+    ptr = new cA[4];
+    cout << "ptr = " << ptr << "\n";
+    ptr->display();
+
+    // Deallocating memory using delete subscript
+    delete[] ptr;
+    /*
+        ptr[3]->~cA();
+        ptr[2]->~cA();
+        ptr[1]->~cA();
+        ptr[0]->~cA();
+        call std::operator delete[](ptr) => free(ptr)
+    */
+    cout << "ptr = " << ptr << "\n";
+    ptr = nullptr;
+    cout << "ptr = " << ptr << "\n";
+}
+```
+
+## Handling insufficient memory
+The new operator throws an exception when there is insufficient memory. new throws a `std::bad_alloc` exception. We can use `std::bad_alloc exception class` or a `derived class of std::bad_alloc`.
+
+```c++
+#define BIG_NUMBER 10000000000LL
+int main()
+{
+    try
+    {
+        int *pI = new int[BIG_NUMBER];
+    }
+    catch (bad_alloc &ex)
+    {
+        cout << "Caught bad_alloc: " << ex.what() << endl;
+    }
+    return 0;
+}
+```
+
+### `nothrow` form of `new`
+
+We can use the nothrow form of new where __exception is not raised__. In case of insufficient memory `nothrow new` returns a `nullptr`.
+
+```c++
+#define BIG_NUMBER 10000000000LL
+int main()
+{
+    int *pI = new (nothrow) int[BIG_NUMBER];
+    if (pI == nullptr)
+    {
+        cout << "Insufficient memory" << endl;
+    }
+    return 0;
+}
+```
+
+## Placement `new`
+
+Normal `new` allocates memory for object in __heap__ and constructs the object in the allocated memory. __Placement new__ takes a pre-allocated memory and object construction is done in the __pre-allocated memory__.
+
+```c++
+class cA
+{
+private:
+    int m_i;
+
+public:
+    cA(int arg = -1) : m_i(arg)
+    {
+        cout << "cA::cA: this = " << this << "\n";
+    }
+    ~cA()
+    {
+        cout << "cA::~cA: this = " << this << "\n";
+    }
+    void display() const
+    {
+        cout << "cA::display: this = " << this << " : m_i = " << m_i << "\n";
+    }
+};
+
+void main()
+{
+    char buffer[1024];
+    cA *ptr = nullptr;
+    cA *ptr1 = nullptr;
+    cA *ptr2 = nullptr;
+    cout << "ptr = " << ptr << "\n";
+    cout << "&buffer = " << (void *)&buffer[0] << "\n";
+    // allocating memory
+    ptr = new (buffer) cA();
+    ptr1 = new (buffer + sizeof(cA)) cA();
+    ptr2 = new (buffer + 2 * sizeof(cA)) cA();
+    cout << "ptr = " << ptr << "\n";
+    ptr->display();
+    // delete ptr; // Never use delete for placement new
+    // Instead call destructor
+    ptr2->~cA();
+    ptr1->~cA();
+    ptr->~cA();
+    ptr = nullptr;
+    ptr1 = nullptr;
+    ptr2 = nullptr;
+}
+
+```
+
+> __Note__: Never use `delete` for deallocating memory for __placement new__. Call the __destructor__ instead. 
+
+## Difference between `new` and `placement new`
+
+|new|placement new|
+|---|-------------|
+|Address or memory location is unknown|Address or memory location is known|
+|Object construction is done in heap memory| Object construction is done at known address|
+|Deallocation is done using __delete__ operator|Deallocation is done by calling __destructor__|
+
+***
+
+# Advanced Type Casters
+
+1. Const Cast
+2. Reinterpret Cast
+3. Static Cast
+4. Dynamic Cast
+
+## Const Cast
+This type caster is used to add or remove the __const qualification__ from a variable. It can be used to temporarily cast away the constness of an object, which allows the modification.
+
+Example 1
+
+```c++
+void gfun(const int *ip)
+{
+    int *ip2 = const_cast<int *>(ip);
+    cout << " ip2 = " << ip2 << ", *ip2 = " << *ip2 << "\n";
+    //Changing value
+    *ip2 = 2000;
+    cout << " ip2 = " << ip2 << ", *ip2 = " << *ip2 << "\n";
+}
+void main()
+{
+    const int i = 10;
+    cout << " i = " << i << ", &i = " << &i << "\n";
+    gfun(&i);
+    cout << " i = " << i << ", &i = " << &i << "\n";
+}
+```
+
+Example 2
+
+```c++
+void gfun(const int *ip)
+{
+    int *ip2 = const_cast<int *>(ip);
+    cout << " ip2 = " << ip2 << ", *ip2 = " << *ip2 << "\n";
+    *ip2 = 2000;
+    cout << " ip2 = " << ip2 << ", *ip2 = " << *ip2 << "\n";
+}
+
+void main()
+{
+    const int i = 10;
+    const int * li = &i;
+    cout << " i = " << i << ", &i = " << &i << "\n";
+    cout << " *li = " << *li << ", li = " << li << "\n";
+    gfun(&i);
+    cout << " i = " << i << ", &i = " << &i << "\n";
+    cout << " *li = " << *li << ", li = " << li << "\n";
+}
+```
+
+`const_cast` can be used to change non-const class members inside a constant member function. Inside const member function this is treated as `const Student* const this` i.e., this is a constant pointer pointing to a constant object.
+
+```c++
+class Student
+{
+private:
+    int roll;
+
+public:
+    // constructor
+    Student(int r) : roll(r) {}
+    // A const function that changes roll with the help of const_cast
+    void fun() const
+    {
+        (const_cast<Student *>(this))->roll = 5;
+    }
+    int getRoll() { return roll; }
+};
+
+int main(void)
+{
+    Student s(3);
+    cout << "Old roll number: " << s.getRoll() << endl;
+    s.fun();
+    cout << "New roll number: " << s.getRoll() << endl;
+    return 0;
+}
+```
+
+## Reinterpret Cast
+
+This type caster allows you to perform low-level reinterpretation of data, __converting one type to another without any checks or conversions__. 
+
+It is typically used for casting between unrelated types, such as __converting a pointer to an integer or vice versa__. Reinterpret casting should be used with caution, as it can lead to undefined behaviour if misused.
+
+```c++
+void main()
+{
+    struct sA
+    {
+    };
+    union uA
+    {
+    };
+
+    sA *sp = nullptr;
+    uA *up = new uA();
+
+    sp = reinterpret_cast<sA *>(up);
+    cout << "up = " << up << "\n";
+    cout << "sp = " << sp << "\n";
+}
+```
+
+## Static Cast
+
+This is the most used type caster in C++. It allows you to perform a wide range of conversions, including __implicit conversions, narrowing conversions, and up casting/down casting within an inheritance hierarchy__.
+
+#### Converting a `double` to a `char` type
+
+```c++
+void main()
+{
+    double d = 65.5;
+    char ch;
+    // ch = (char)(short)(int)d; // Regular way
+    ch = static_cast<char>(d);
+    cout << "ch = " << ch << "\n";
+}
+```
+
+#### Static cast in Inheritance
+
+```c++
+void main()
+{
+    // Multi level inheritance
+    struct sA
+    {
+    };
+    struct sB : sA
+    {
+    };
+    struct sC : sB
+    {
+    };
+    struct sD : sC
+    {
+    };
+
+    sA *ap = new sA();
+    sB *bp = nullptr;
+    sC *cp = nullptr;
+    sD *dp = nullptr;
+
+    cout << "ap = " << ap << "\n";
+    cout << "bp = " << bp << "\n";
+    cout << "cp = " << cp << "\n";
+    cout << "dp = " << dp << "\n";
+
+    // ap = (sA *)(sB *)cp; // up-casting - Regular way
+    bp = static_cast<sB *>(ap);
+    cp = static_cast<sC *>(ap);
+    dp = static_cast<sD *>(ap);
+    cout << "ap = " << ap << "\n";
+    cout << "bp = " << bp << "\n";
+    cout << "cp = " << cp << "\n";
+    cout << "dp = " << dp << "\n";
+}
+```
+
+## Dynamic Cast
+
+This type caster is specifically used for performing safe __down casting (converting a base class pointer/reference to a derived class pointer/reference)__ in `polymorphic` class hierarchies. 
+
+It performs a __runtime type__ check to ensure the conversion is valid, __returning a pointer/reference of the derived class type if successful or a null pointer__ if the conversion is not possible. To perform dynamic casting at least __one function needs to be virtual__.
+
+
+```c++
+void main()
+{
+    struct sA
+    {
+        virtual ~sA() {} // Mandatory
+    };
+    struct sB : sA
+    {
+    };
+    struct sC : sB
+    {
+    };
+    struct sD : sC
+    {
+    };
+    // Try changing the dervied class to see how dynamic casting works
+    sA *ap = new sB(); 
+    sB *bp = nullptr;
+    sC *cp = nullptr;
+    sD *dp = nullptr;
+
+    cout << "ap = " << ap << "\n";
+    cout << "bp = " << bp << "\n";
+    cout << "cp = " << cp << "\n";
+    cout << "dp = " << dp << "\n";
+
+    // ap = dynamic_cast<sA *>(bp);
+    bp = dynamic_cast<sB *>(ap);
+    cp = dynamic_cast<sC *>(ap);
+    dp = dynamic_cast<sD *>(ap);
+
+    cout << "ap = " << ap << "\n"; // same address
+    cout << "bp = " << bp << "\n"; // same address
+    cout << "cp = " << cp << "\n"; // nullptr
+    cout << "dp = " << dp << "\n"; // nullptr
+}
+```
+
+# Imp Topics / Questions
+
+1. What Are the Functions That Are Generated by the Compiler by Default, If We Do Not Provide Them Explicitly?
+
+    1. Default Constructor
+    2. Copy Constructor
+    3. Move Constructors
+    4. Assignment Operator
+    5. Destructor

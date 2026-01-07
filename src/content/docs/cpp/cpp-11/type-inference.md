@@ -9,7 +9,7 @@ Types of type inference
 1. auto
 2. decltype
 
-### auto
+## auto
 The `auto` keyword deduces type from its intitializer.
 
 In case of function, if the return type is auto then type will be evaluated by return type expression at run time.
@@ -17,6 +17,9 @@ In case of function, if the return type is auto then type will be evaluated by r
 1. Declaration
 2. Definition
 3. Initialization
+
+- The variable declared with `auto` keyword should be initialized at the time of its __declaration__ only or else there will be a __compile-time error__.
+- `auto` becomes `int` if a function returns an integer reference `int&`. To make it to reference type we use, `auto &
 
 #### The `auto` keyword does 2 things
 1. To infer the type
@@ -38,12 +41,7 @@ typeid(li).name() = d
 li = 11
 ```
 
-> __NOTE__:
-> 1. The variable declared with `auto` keyword should be initialized at the time of its __declaration__ only or else there will be a __compile-time error__.
-> 2. `auto` becomes `int` if a function returns an integer reference `int&`. To make it to reference type we use, `auto &`
-
-
-### decltype
+## decltype
 The `decltype` keyword inspects the declared type of an entity or type of an expression. `decltype` lets you extract the type from variable.
 
 ```c++

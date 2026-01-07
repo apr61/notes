@@ -10,6 +10,7 @@ A pointer is a variable that is used to store the address of a variable or an ob
 3.	To iterate over elements of arrays or other data structures
 
 ## Function Pointer
+A Function pointer is a vaiable that holds the address of a function. It allows us to call the function dynamically, pass it as an argument (callbacks).
 
 ```c++
 int add(int a, int b)
@@ -31,7 +32,7 @@ Two types of const pointer
 2. Constant Pointer
 3. Constant pointer to constant
 
-### 1. Pointer Constant
+### 1. Pointer to Constant
 __Value constant__ and __address changes__
 
 #### Syntax
@@ -74,6 +75,22 @@ int x = 10;
 
 const int * const ptr = &x;
 ```
+
+## Dangling pointer
+A pointer pointing to memory location that has been deleted(or freed). Accessing the memory location that has been freed can lead to unexpected behavior.
+
+## Void Pointer
+Void pointer is a generic pointer that can hold the memory address of any data type, acting as a placeholder for any data type.
+
+- Any pointer can be converted to void pointer.
+- Void pointers cannot be dereferenced, but dereferncing can be done using typecasting the void pointer.
+- Pointer arithmatic is not possible on void pointers due to the lack of concrete value and size.
+
+## Wild pointer
+A pointer that is not initialized to any thing, not even null is known as wild pointer. The pointer may be initialized to non-null garbage value that may not be a valid address.
+
+## Raw pointer
+A raw pointer is a pointer whose lifetime isn't controlled by an encapsulating object such as smart pointer. A raw pointer can be assigned the address of another non-pointer variable or can be assigned a value of nullptr.
 
 ## new - delete operators
 Dynamic memory allocation and deallocation of objects is done by using the new and delete operators. 

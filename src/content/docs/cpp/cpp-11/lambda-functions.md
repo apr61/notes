@@ -58,13 +58,41 @@ C++ Lambda expression allows us to define anonymous function objects (functors) 
 
 #### Lambda parts 
 
-[1] (2) 3 4 -> 5 {6}
-1. Capture
-2. Arguments
-3. const/mutable
-4. Exception throw
-5. Return type
-6. Body
+```c++
+[capture_list](parameters) const_mutable exception_throw -> return_type{
+    //function_body
+};
+```
+
+- ***capture_list*** : A list of variables from the surrounding scopen that the lambda function can access.
+    - `=` can be used to capture surrounding variables by value
+    - `&` can be used to capture surrounding varaibles by reference
+
+- ***parameters*** : The list of input parameters.
+
+- ***const_mutable*** : By befault the varaible captured by value are constant `const`. The behavior can be changed by adding the `mutable` keyword, which removes the constness from the lambda function.
+
+- ***exception_throw*** : The `noexcept` specifier can be placed after the parameter list, which informs the compiler that lambda is guaranteed not to throw any exception.
+
+- ***return_type*** : The type of the value that the lambda function will return.
+
+- ***function_body*** : The code that defines the operation that a lambda function performs
+
+- The capture_list and function_body are the required parts of a lambda function. Remaining other fields are optional.
+
+```c++
+int main()
+{ 
+    // A valid lambda function
+    auto func = [] {
+        std::cout << "Hello world"; 
+    };
+    
+    func();
+
+    return 0;
+}
+```
 
 ```c++
 int main()
@@ -88,7 +116,7 @@ add(10,15) = 25
 
 ### Capture clause
 
-Capture clause can apture all variables that are till the lambda function.
+Capture clause can capture all variables that are till the lambda function.
 
 1. Capture variable by value
 

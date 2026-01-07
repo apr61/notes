@@ -16,7 +16,8 @@ export default defineConfig({
             { label: "Getting Stated", slug: "cpp/getting-started" },
             { label: "Basics", slug: "cpp/basics-in-cpp" },
             {
-              label: "Basics", items: [
+              label: "Basics",
+              items: [
                 { label: "Memory model", slug: "cpp/basics/memory-model" },
                 { label: "Memory model", slug: "cpp/basics/compilation-stages" },
                 {
@@ -31,7 +32,8 @@ export default defineConfig({
                   label: "Shallow Copy and deep copy",
                   slug: "cpp/basics/shallow-copy-deep-copy",
                 },
-              ]
+              ],
+              collapsed: true
             },
             {
               label: "Pointers and References",
@@ -39,7 +41,8 @@ export default defineConfig({
                 [
                   { label: "Pointers", slug: "cpp/pointers-references/pointers" },
                   { label: "References", slug: "cpp/pointers-references/references" }
-                ]
+                ],
+              collapsed: true
             },
             {
               label: "Oops",
@@ -52,17 +55,18 @@ export default defineConfig({
                   slug: "cpp/oops/aggregation-composition",
                 },
               ],
+              collapsed: true
             },
             {
               label: "CPP 11",
               items: [
-                { label: "Reference", slug: "cpp/cpp-11/reference" },
                 { label: "Type Inference", slug: "cpp/cpp-11/type-inference" },
                 {
                   label: "Lambda Functions",
                   slug: "cpp/cpp-11/lambda-functions",
                 },
               ],
+              collapsed: true
             },
             {
               label: "cmake",

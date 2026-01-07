@@ -3,8 +3,6 @@ title: CPP topics
 date: 04/01/2026
 ---
 
-# Cpp
-
 ## Basic Concepts
 - [Memory Model](basics/memory-model)
 - [Compilation stages](basics/compilation-stages)
@@ -17,7 +15,7 @@ date: 04/01/2026
 - Const correctness
 - RAII (Resource Acquisition Is Initialization)
 - Undefinded behavior vs inplementation-defined behavior
-- Lvalues/Rvalues
+- [Lvalues/Rvalues](pointers-references/references#lvalue-and-rvalue)
 - Copy Semantics
 - [Deep Copy and Shallow Copy](basics/shallow-copy-deep-copy)
 
@@ -36,17 +34,17 @@ date: 04/01/2026
 
 ## Pointers and references
 - [Constant Pointers](pointers-references/pointers#const-pointers)
-- Function pointers
-- Dangling pointers
-- Void pointers
-- Raw pointers
+- [Function pointers](pointers-references/pointers#function-pointer)
 - [References](pointers-references/references)
+- [new-delete](pointers-references/pointers#new---delete-operators)
+- [Lvalue & Rvalue reference](pointers-references/references#lvalue-and-rvalue-reference-c-11)
+- [Perfect forwarding](pointers-references/references#perfect-forwarding)
+- Smart pointers
 
 ## Cpp 11
-- Smart pointers
-- Lambda Expressions
+- [Lambda Expressions](cpp-11/lambda-functions)
 - Variadic Templates
-- Type inference
+- [Type inference](cpp-11/type-inference)
 - Move semantics
 - Uniform initialization
 - static_assert
