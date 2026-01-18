@@ -13,7 +13,7 @@ export default defineConfig({
         {
           label: "CPP",
           items: [
-            { label: "Getting Stated", slug: "cpp/getting-started" },
+            { label: "Getting Started", slug: "cpp/getting-started" },
             { label: "Basics", slug: "cpp/basics-in-cpp" },
             {
               label: "Basics",
@@ -64,6 +64,10 @@ export default defineConfig({
                 {
                   label: "Lambda Functions",
                   slug: "cpp/cpp-11/lambda-functions",
+                },
+                {
+                  label: "Smart pointers",
+                  slug: "cpp/cpp-11/smart-pointers",
                 },
               ],
               collapsed: true

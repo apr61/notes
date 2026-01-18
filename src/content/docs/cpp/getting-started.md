@@ -39,7 +39,7 @@ date: 04/01/2026
 - [new-delete](pointers-references/pointers#new---delete-operators)
 - [Lvalue & Rvalue reference](pointers-references/references#lvalue-and-rvalue-reference-c-11)
 - [Perfect forwarding](pointers-references/references#perfect-forwarding)
-- Smart pointers
+- [Smart pointers](cpp-11/smart-pointers)
 
 ## Cpp 11
 - [Lambda Expressions](cpp-11/lambda-functions)
