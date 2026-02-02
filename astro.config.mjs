@@ -13,13 +13,11 @@ export default defineConfig({
         {
           label: "CPP",
           items: [
-            { label: "Getting Started", slug: "cpp/getting-started" },
-            { label: "Basics", slug: "cpp/basics-in-cpp" },
             {
               label: "Basics",
               items: [
                 { label: "Memory model", slug: "cpp/basics/memory-model" },
-                { label: "Memory model", slug: "cpp/basics/compilation-stages" },
+                { label: "Compilation stages", slug: "cpp/basics/compilation-stages" },
                 {
                   label: "Type Casters",
                   slug: "cpp/basics/advanced-type-casters-in-cpp",
@@ -50,6 +48,7 @@ export default defineConfig({
                 { label: "Oops", slug: "cpp/oops/oops-in-cpp" },
                 { label: "Inheritance", slug: "cpp/oops/inheritance-in-cpp" },
                 { label: "Polymorphism", slug: "cpp/oops/polymorphism-in-cpp" },
+                { label: "Rule of five, three, zero", slug: "cpp/oops/rules-of-five-three-zero" },
                 {
                   label: "Aggregation and composition",
                   slug: "cpp/oops/aggregation-composition",
@@ -78,6 +77,7 @@ export default defineConfig({
                 { label: "Shared Library", slug: "cpp/cmake/shared-lib" },
                 { label: "Static Library", slug: "cpp/cmake/static-lib" },
               ],
+              collapsed: true
             },
           ],
           collapsed: true,

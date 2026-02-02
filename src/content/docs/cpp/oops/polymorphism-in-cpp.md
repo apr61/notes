@@ -13,10 +13,10 @@ The word __polymorphism__ means having many forms. We can define polymorphism as
 2. Run Time Polymorphism / Late Binding / Dynamic Ploymorphism
     1. Function Overriding (Virtual Functions)
 
-## Compile Time Polymorphism
+### Compile Time Polymorphism
 This type of polymorphism is acheived by __Function Overloading__ or __Operator Overloading__.
 
-## Function Overloading
+#### Function Overloading
 
 When there are multiple functions with same name and different parameters, thoses functions are called overloadded funtions. __Function Overloading__ can be achieved by changing the __number of arguments__ or/and changing the __type of arguments__.
 
@@ -55,11 +55,11 @@ add(1, 3, 5) = 9
 add(1.5, 3.5) = 5
 ```
 
-## Run Time Polymorphism
+### Run Time Polymorphism
 
 This type of polymorphism is achieved by __Function Overriding__. The function call is resolved at runtime in runtime polymorphism. 
 
-## Function Overriding
+#### Function Overriding
 
 Function overridding occurs when a derived class has a definition for one of the member functions of base class. The base class function gets __overridden__.
 
@@ -75,7 +75,7 @@ A __virtual function__ is a member function that is declared in the base class u
 3. Virtual functions should be accessed using a pointer or reference of base class type to achieve runtime polymorphism.
 4. The prototype of virtual functions should be the same in the base as well as the derived class.
 5. Virtual functions are always defined in the base class and overridden in a derived class. It is not mandatory for the derived class to override (or re-define the virtual function), in that case, the base class version of the function is used.
-6. A class can have a __virtual destructor__ but cannot have virtual constructor.
+6. A class can have a __virtual destructor__ but cannot have virtual constructor. Because the VTBALE is created by the constructor. Without VTABLE run time polymorphism is not possible.
 
 #### Example 1
 
@@ -203,7 +203,7 @@ mostDerived :: m_fun1() non virtual
 ~base1()
 ```
 
-## Pure Virtual functions
+### Pure Virtual functions
 
 A Pure Virtual function is a virtual function which does not have any implementation in the __base class__. A pure virtual function is declared by assigning a `0` in the declaration. For a pure virtual function each and every derived classes must have there own definition(implementation).
 
@@ -224,7 +224,7 @@ public:
 Any class with atleast one __Pure Virtual Function__ is called a Abstract class.
 
 __Note__:
-1. For abstract class Object creatio or instantiation is not possible.
+1. For abstract class Object creation or instantiation is not possible.
 2. If a derived class doesn't overide base class Pure virtual function then the derived class also becomes a _Abstract class_.
 3. We can create a pointer variable for abstract class which can refer to any of it's derived class.
 
@@ -368,12 +368,31 @@ Derived display() this = 0xfc1760
 ## Virtual function mechanisms
 ### Virtual Table (VTABLE) and Virtual Pointer (VPTR)
 
-__VTABLE__: A table of virtual function pointers, maintained per class. (`static` array of function pointers) 
+#### VTABLE
+- A table of virtual function pointers, maintained per class that is created by the compiler (`static` array of function pointers). 
+- Whenever a class contains a virtual function, the compiler creates a VTABLE for that class. 
+- The VTABLE has one entry for each virtual function accessible by class. 
+- These entries are pointers to most derived function that the current object should call. 
+
 __VPTR__: A pointer to vtable, maintained per object instance which points to the VTABLE. When a new object is created, a new VPTR is insterted as a data member of that class.
 
-The `virtual` keyword tells the compiler not to perform early binding. Late binding is implemented by using the VTABLE. VTABLE is created for each class which has a virtual function.
+- The `virtual` keyword tells the compiler not to perform early binding. Late binding is implemented by using the VTABLE. VTABLE is created for each class which has a virtual function.
+- During Base constructor, VPTR points to base VTABLE
+- During Derived constructor, VPTR points to derived VTABLE
+- Virtual calls inside constructor/destrcutor do NOT dispatch to derived versions
+- VPTR is created per object, VTABLE is created per class
 
-## Virtual Destructor
+### Memory overhead
+
+| Item              | Size                                    |
+| ----------------- | --------------------------------------- |
+| vptr (per object) | 8 bytes (64-bit)                        |
+| vtable entry      | 8 bytes                                 |
+| vtable size       | `(virtual funcs + RTTI) × pointer size` |
+| vtable count      | One per polymorphic class               |
+
+
+### Virtual Destructor
 Deleting a derived class object using a base class pointer that has a non-virtual destructor will result in undefined behaviour.
 
 #### Example
@@ -518,7 +537,7 @@ this :: 0x61fdd0, m_i :: -1
 ~base1()
 ```
 
-## Friend classes
+### Friend classes
 
 - The friend class member functions has access to the private members defined within the class.
 - When one class is a friend of another, it only has access to memebrs defined within class. It does not inherit the other class
@@ -670,3 +689,111 @@ this :: 0x61fdc0, m_j = -1
 ~base1()
 ```
 
+## RTTI (Run Time Type Information)
+- This allows C++ program to know the actual (dynamic) type of an object at run time.
+- RTTI is mainly used with polymorphic classes (with virtual functions)
+
+Conside below example
+
+```c++
+class Base {
+public:
+    virtual ~Base() {}
+};
+
+class Derived : public Base {};
+
+Base* b = new Derived();
+```
+
+- At compile time, `b` is `Base *`
+- At runtime, the object is `Derivied`
+
+RTTI is provided by C++ through
+- `typeid`
+- `dynamic_cast`
+
+### typeid
+
+```c++
+#include <iostream>
+#include <typeinfo>
+
+class Base {
+public:
+    Base() {
+        std::cout << "Base::Base()" << std::endl;    
+    }   
+    
+    virtual ~Base()
+    {
+        std::cout << "Base::~Base()" << std::endl;
+    }
+};
+
+class Derived : public Base{
+public:
+    Derived() {
+        std::cout << "Derived::Derived()" << std::endl;
+    }
+    ~Derived()
+    {
+        std::cout << "Derived::~Derived()" << std::endl;
+    }
+};
+
+
+int main()
+{
+    Base * b1 = new Derived();
+
+    std::cout << typeid(*b1).name() << std::endl;
+    std::cout << typeid(b1).name() << std::endl;
+    
+    delete b1;
+
+    return 0;
+}
+```
+
+#### Output
+```sh
+Base::Base()
+Derived::Derived()
+7Derived
+P4Base
+Derived::~Derived()
+Base::~Base()
+```
+
+### dynamic_cast
+Used for safe downcasting
+- Returns `nullptr` if cast fails (for pointers)
+- Throws `std::bad_cast` for references
+
+```c++
+int main()
+{
+    Base * b = new Derived();
+
+    Derived* d = dynamic_cast<Derived*>(b);
+
+    if(d) {
+        std::cout << "Cast successful\n";
+
+        delete d;
+    }
+    else
+    {
+        delete b;
+    }
+}
+```
+
+```sh
+Base::Base()
+Derived::Derived()
+Cast successful
+Derived::~Derived()
+Base::~Base()
+```

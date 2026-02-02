@@ -20,16 +20,19 @@ date: 04/01/2026
 - [Deep Copy and Shallow Copy](basics/shallow-copy-deep-copy)
 
 ## OOPS 
-- Encapsulation (Access Specifiers)
-- Polymorphism
-- Inheritance
-- Abstraction
-- Interfaces
-- Virtual Methods/tables/destructors
-- Rules of Zero, three and five
-- Friend class and functions
+- [Constructors](oops/oops-in-cpp#constructor)
+- [Encapsulation (Access Specifiers)](oops/oops-in-cpp#encapsulation)
+- [Polymorphism](oops/polymorphism-in-cpp#types-of-polymorphism)
+- [Inheritance](oops/inheritance-in-cpp)
+- [Abstraction](oops/polymorphism-in-cpp#abstract-class)
+- [Interfaces](oops/polymorphism-in-cpp#interface-class)
+- [Virtual Methods/tables/destructors](oops/polymorphism-in-cpp#virtual-function-mechanisms)
+- [Rules of Zero, three and five](oops/rules-of-five-three-zero)
+- [Friend class and functions](oops/polymorphism-in-cpp#friend-functions-and-classes)
 - Composition vs inheritance
 - final and override
+- [Invariant](oops/rules-of-five-three-zero#what-is-invariant)
+- [RTTI](oops/polymorphism-in-cpp#rtti-run-time-type-information)
 
 
 ## Pointers and references

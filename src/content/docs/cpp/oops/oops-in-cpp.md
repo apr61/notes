@@ -15,7 +15,12 @@ Object is an instance of class. When a class is defined, no memory is allocated 
 3. Inheritance
 4. Polymorphism
 
-## Access Specifiers
+## Encapsulation
+- Encapsulation is the process of bundling data and functions that operate on that data in a single unit.
+- Encapsulation helps to hide internal implementation details of a class and expose necessary information and functionalities.
+- Encapsulation can be achieved using access specifiers
+
+### Access Specifiers
 Assigns accessibility to the class members.
 
 Three types of access specifiers
@@ -23,15 +28,15 @@ Three types of access specifiers
 2. private
 3. protected
 
-### `public`
+#### `public`
 `public` data memebers can be accessed by anyone and from anywhere int the program using direct member access operator(.)
 
-### `private`
+#### `private`
 `private` gives access to only member functions. Cannot be accessed outside class.
 
 __friend functions__ are allowed to access `private` data members.
 
-### `protected`
+#### `protected`
 Can be accessed only by sub classes(derived classes) of that class. __friend classes__ can also access.
 
 ## Constructor
