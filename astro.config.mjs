@@ -13,6 +13,7 @@ export default defineConfig({
         {
           label: "CPP",
           items: [
+            { label: "Getting Started", slug: "cpp/getting-started" },
             {
               label: "Basics",
               items: [
@@ -149,7 +150,28 @@ export default defineConfig({
               items: [
                 {
                   label: "iptables",
-                  slug: "networking/firewall/iptables"
+                  items: [
+                    {
+                      label: "Firewall Basics",
+                      slug: "networking/firewall/iptables/basics"
+                    },
+                    {
+                      label: "Iptables Commands",
+                      slug: "networking/firewall/iptables/commands"
+                    },
+                    {
+                      label: "Basic Matches",
+                      slug: "networking/firewall/iptables/basic-matches"
+                    },
+                    {
+                      label: "Advanced Matches",
+                      slug: "networking/firewall/iptables/advanced-matches"
+                    },
+                    {
+                      label: "Challenges",
+                      slug: "networking/firewall/iptables/challenges"
+                    },
+                  ],
                 }
               ]
             }
