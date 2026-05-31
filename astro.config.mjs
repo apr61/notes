@@ -168,6 +168,10 @@ export default defineConfig({
                       slug: "networking/firewall/iptables/advanced-matches"
                     },
                     {
+                      label: "ipset",
+                      slug: "networking/firewall/iptables/ipset"
+                    },
+                    {
                       label: "Challenges",
                       slug: "networking/firewall/iptables/challenges"
                     },
