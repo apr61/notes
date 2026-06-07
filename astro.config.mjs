@@ -170,6 +170,14 @@ export default defineConfig({
                     {
                       label: "ipset",
                       slug: "networking/firewall/iptables/ipset"
+                    }, 
+                    {
+                      label: "Targets",
+                      slug: "networking/firewall/iptables/targets"
+                    }, 
+                    {
+                      label: "nmap",
+                      slug: "networking/firewall/iptables/nmap"
                     },
                     {
                       label: "Challenges",
