@@ -207,6 +207,10 @@ export default defineConfig({
                 {
                   label: "SE Linux Context",
                   slug: "linux/selinux/selinux"
+                },
+                {
+                  label: "Policy Creation",
+                  slug: "linux/selinux/policy_creation"
                 }
               ]
             }
