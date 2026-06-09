@@ -5,6 +5,18 @@ date: 08/06/2026
 
 ## Policy creation
 
+### Custom module policy
+
+We will be creating a custom module for a application and help it run in it's own domain.
+
+```c++
+// my_app.cpp
+
+int main()
+{
+}
+```
+
 ```sh
 # my_app.te
 
@@ -20,11 +32,9 @@ require {
 	attribute domain;
 	type unconfined_t;
 	class process { transition fork sigchld };
-	class file { execute getattr open read map entrypoint execute_no_trans };
-
-	type user_home_t;
-	type user_home_dir_t;
-	class dir { search getattr };
+	class file { execute getattr open read map entrypoint };
+	
+	role unconfined_r;
 }
 
 # Without a require block, the compiler doesn't know what `unconfined_t` is.
@@ -53,12 +63,11 @@ type my_app_exec_t;
 
 typeattribute my_app_exec_t exec_type;
 
-# Define the my_app_exec_t has a file_type
+# Define the my_app_exec_t as a file_type
 typeattribute my_app_exec_t file_type;
 
-
+# Define my_app_t as a domain
 typeattribute my_app_t domain;
-
 
 # 6. Allow rules
 
@@ -76,10 +85,6 @@ allow my_app_t self:process { fork sigchld };
 allow unconfined_t my_app_exec_t:file { getattr open read execute map };
 allow my_app_t my_app_exec_t:file { getattr open read execute map };
 
-
-allow my_app_t user_home_dir_t:dir search;
-allow my_app_t user_home_t:dir { search getattr };
-
 # 7. Domain transisition
 
 # 7.1 Create type_transition rule
@@ -88,7 +93,7 @@ type_transition unconfined_t my_app_exec_t:process my_app_t;
 
 # When:
 #  unconfined_t
-#	executes
+#       executes
 #   my_app_exec_t
 #       create the new process in
 #   my_app_t
@@ -102,7 +107,13 @@ allow unconfined_t my_app_t:process transition;
 # Allow unconfined_t to transition into my_app_t
 # Permission to change the domain
 
+# 7.3 Allow entrypoint of my_app_exec_t to my_app_t
+
 allow my_app_t my_app_exec_t : file entrypoint;
+
+# 8. Allow unconfined_r to use processes of type my_app_t
+
+role unconfined_r types my_app_t;
 ```
 
 ```sh
@@ -168,7 +179,7 @@ unconfined_u:object_r:user_home_t:s0 my_app
 pradeep@fedora:~/selinux/my_app$ 
 ```
 
-#### Restoring the security conmtext
+#### Restoring the security context
 
 ```sh
 sudo restorecon -v my_app
@@ -181,4 +192,12 @@ pradeep@fedora:~/selinux/my_app$
 pradeep@fedora:~/selinux/my_app$ ls -Z my_app
 unconfined_u:object_r:my_app_exec_t:s0 my_app
 pradeep@fedora:~/selinux/my_app$ 
+```
+
+### SE Linux AVC audit
+
+#### Read AVC denials or policy violations
+
+```sh
+ausearch -m AVC -ts recent | audit2why
 ```
