@@ -156,6 +156,10 @@ export default defineConfig({
                       slug: "networking/firewall/iptables/basics"
                     },
                     {
+                      label: "Chain Traversal Order",
+                      slug: "networking/firewall/iptables/chain_traversal_order"
+                    },
+                    {
                       label: "Iptables Commands",
                       slug: "networking/firewall/iptables/commands"
                     },
@@ -181,7 +185,8 @@ export default defineConfig({
                     }, {
                       label: "NAT",
                       slug: "networking/firewall/iptables/nat"
-                    }, {
+                    }, 
+                    {
                       label: "User Defined Chains",
                       slug: "networking/firewall/iptables/user_defined"
                     },

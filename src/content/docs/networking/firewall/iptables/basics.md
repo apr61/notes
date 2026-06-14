@@ -18,25 +18,25 @@ In Linus OS, firewalling is taken care by <code>netfilter</code>. <code>netfilte
 **Note** - Other tools like <code>iptables</code> are <code>firewalld</code> and <code>ufw</code>.
 
 
-## iptables architecture
+## Iptables architecture
 
 1. chains
 2. tables
 3. targets
 
-### chains
+### Chains
 There are a total of five chains in <code>iptables</code>.
 
-1. **PREROUTING** - This chain decides what happens to a packet as soon as it arrives at the network interface. We can alter the packet, drop the packet or doing nothing.
+1. **PREROUTING** - This chain decides what happens to a packet as soon as it arrives at the network interface. We can alter the packet, drop the packet or doing nothing. Used in DNAT/Port forwarding.
 
 2. **INPUT** - This is one of the popular chains. This is where packets enter the system. Blocking/opening of a port can be can be done in this chain.
 
 3. **FORWARD** - This chain is responsible for packet forwarding.
 
 4. **OUTPUT** - This is the chain where packets are emitted by/leaving the system.
-5. **POSTROUTING** - This is the chain where packets leave their trace last, before leaving the computer.
+5. **POSTROUTING** - This is the chain where packets leave their trace last, before leaving the computer. Used for SNAT/ MASQUERADE
 
-### tables
+### Tables
 There are five tables in <code>iptables</code>
 
 1. **filter** - This is default table. This table decides whether a packet is allowed in/out of computer. Blocking of port or stop receiving anything can be done here.
@@ -51,7 +51,7 @@ There are five tables in <code>iptables</code>
 		2. POSTROUTING
 		3. OUTPUT
 
-3. **mangle** - Modifies packet headers either before coming or leaving out.
+3. **mangle** - Modifies packet headers either before coming or leaving out. 
 	Common chains are
 		1. PREROUTING
 		2. POSTROUTING
@@ -59,7 +59,7 @@ There are five tables in <code>iptables</code>
 		4. OUTPUT
 		5. FORWARD
 
-4. **raw** - Used mainly to track connection state.
+4. **raw** - Used mainly to track connection state. The raw table is only used to set a mark on packets that should not be handled by the connection tracking system. This is done by using the `NOTRACK` target on the packet.
 	Common chains are
 		1. PREROUTING
 		2. OUTPUT
