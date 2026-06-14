@@ -178,6 +178,12 @@ export default defineConfig({
                     {
                       label: "nmap",
                       slug: "networking/firewall/iptables/nmap"
+                    }, {
+                      label: "NAT",
+                      slug: "networking/firewall/iptables/nat"
+                    }, {
+                      label: "User Defined Chains",
+                      slug: "networking/firewall/iptables/user_defined"
                     },
                     {
                       label: "Challenges",
