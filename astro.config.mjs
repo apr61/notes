@@ -130,6 +130,10 @@ export default defineConfig({
                   slug: "cryptography/tls/tls_1_2_overview"
                 },
                 {
+                  label: "TLS 1.3 Overview",
+                  slug: "cryptography/tls/tls_1_3"
+                },
+                {
                   label: "Cryptography Terms",
                   slug: "cryptography/tls/cryptography_terms"
                 },
