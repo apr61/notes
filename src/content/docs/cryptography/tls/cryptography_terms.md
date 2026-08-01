@@ -50,3 +50,86 @@ date: 26/04/2025
 | 🔒 Security purpose       | Identity verification, secure key exchange | Secure data transmission        |
 
 ---
+
+## AEAD
+
+AEAD stands for 
+> Authenticated Encryption with Associated Data
+
+We are considering TLS 1.2 and TLS 1.3 as example
+
+### Without AEAD
+
+TLS 1.2 often used 
+
+> Encrypt + HMAC
+
+For example
+
+> AES-CBC + HMAC
+
+
+Workflow:
+
+```txt
+plaintext -> HMAC -> Append MAC -> Encrypt
+```
+
+Receiver:
+
+```txt
+Decrypt -> Verify MAC
+```
+
+Encryption and integrity are two separate operations.
+
+### With AEAD
+
+AEAD combines both into one algorithm
+
+```txt
+Plaintext -> AEAD encrypt -> Ciphertext -> Authentication Tag
+```
+
+#### Receiver
+
+```txt
+AEAD decrypt -> Tag verified? 
+
+YES -> Plaintext
+NO -> Reject
+```
+
+One operation provides:
+1. Confidentiality
+2. Integrity
+3. Authenticity
+
+### Associated Data in AEAD
+
+Sometimes information is not encrypted but still needs integrity protection.
+
+For example, TLS record header:
+
+1. Content Type
+2. Protocol Version
+3. Record Length
+
+These fields remain visible on the wire.
+
+AEAD protects them from modification.
+
+Conceptually AEAD works in this way
+
+```txt
+AEAD_Encrypt(
+  plaintext,
+  associated_data,
+  Key,
+  IV
+)
+```
+
+The associated data is authenticated but not encrypted.
+If associcated data is modified, authentication fails.
+

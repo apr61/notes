@@ -50,7 +50,7 @@ TLS 1.3 supports three basic key exchange methods
 RTT - Round Trip Time
 
 - When clients and servers share a PSK, TLS 1.3 allows clients to send data on the first flight (early data).
-- The client uses the uses the PSK to authenticate the server and encrypt early data.
+- The client uses the PSK to authenticate the server and encrypt early data.
 - The 0-RTT data is just added to the 1-RTT handshake in the first flight. Rest of the handshake uses the same messages as for the 1-RTT handshake with PSK resumption.
 
 ![0-RTT handshake flow](../../../../assets/tls/tls_1_3/0_rtt_handshake_flow.png)
@@ -200,6 +200,149 @@ Handshake key != Application key != Resumption key
 ![TLS 1.3 Key Derivation - Early Secret](../../../../assets/tls/tls_1_3/tls_1.3_key_derivation_flow_1.png)
 ![TLS 1.3 Key Derivation - Handhsake Secret](../../../../assets/tls/tls_1_3/tls_1.3_key_derivation_flow_2.png)
 ![TLS 1.3 Key Derivation - Application Secret](../../../../assets/tls/tls_1_3/tls_1.3_key_derivation_flow_3.png)
+
+- The __Early Secret__, __Handshake Secret__ and __Master Secret__ are raw entropy without context.
+- Secrets derived from raw secrets include handshake contexts and therefore can be used to derive working keys.
+
+#### 0-RTT vs 1-RTT
+
+In 0-RTT, the Derive-Secret is called with four distict transcripts
+
+| Transcript | `Messages`                                    | Used for                                      |
+| ---------- | --------------------------------------------- | --------------------------------------------- |
+| #1         | `""`                                          | `Derive-Secret(Early Secret, "derived", "")`  |
+| #2         | `ClientHello`                                 | `"c e traffic"` (client early traffic secret) |
+| #3         | `ClientHello \|\| ServerHello`                | `"c hs traffic"`, `"s hs traffic"`            |
+| #4         | Full handshake through both Finished messages | `"c ap traffic"`, `"s ap traffic"`            |
+
+
+In 1-RTT, the Derive-Secret is called with three distict transcripts
+
+| Transcript | `Messages`                                    | Used for                                     |
+| ---------- | --------------------------------------------- | -------------------------------------------- |
+| #1         | `""`                                          | `Derive-Secret(Early Secret, "derived", "")` |
+| #2         | `ClientHello \|\| ServerHello`                | `"c hs traffic"`, `"s hs traffic"`           |
+| #3         | Full handshake through both Finished messages | `"c ap traffic"`, `"s ap traffic"`           |
+
+
+#### Updating keys
+
+Once handshake is completed, it is possible for either party to update the sending traffic secrets keys using the KeyUpdate handshake message.
+
+The next generation application_traffic_secret is computed as:
+
+```txt
+application_traffic_secret_N+1 = 
+    HKDF-Expand-Label(applcation_traffic_secret_N,
+        "traffic upd", "", Hash.length
+    )
+```
+
+Once client/server_application_traffic_secret_N+1 and its associated traffic keys have been computed, the old client/server_application_traffic_secret_N and its associated traffic keys should be deleted.
+
+#### Traffic key calculation
+
+The traffic keying material is generated from
+1. A secret value
+2. A purpose value for which the value being generated
+3. The length of key being generated
+
+```txt
+[client/server]_write_key = HKDF-Expand-Label(Secret, "key", "", key_length)
+
+[client/server]_write_iv = HKDF-Expand-Label(Secret, "iv", "", iv_length)
+```
+
+|Record type|Secret|
+|-----------|------|
+|0-RTT Application|client_early_traffic_secret|
+|Handshake|[client/server]_handshake_traffic_secret|
+|Application Data|[client/server]_application_traffic_secret_N|
+
+
+###  Cryptographic algorithms
+
+#### 1. Key exchange algorithms
+
+TLS 1.3 supports only (EC)DHE  Key Exhange.
+
+There is no RSA key exchange in TLS 1.3
+
+|Algorithm|Named group|
+|---|---|
+|ECDH|x25519, x448, secp256r1, secp384r1, secp512r1|
+|Finite field DH|ffdhe2048, ffdhe3072, ffdhe4096, ffdhe6144, ffdhe8192|
+
+#### 2. Digital signatures
+
+|Algorithm|Name|
+|---|---|
+|RSA|rsa_pkcs1_sha256, rsa_pkcs1_sha384, rsa_pkcs1_sha512|
+|RSA-PSS|rsa_pss_rsae_sha256, rsa_pss_rsae_sha384, rsa_pss_rsae_sha512|
+|RSA-PSS with PSS keys|rsa_pss_pss_sha256, rsa_pss_pss_sha384, rsa_pss_pss_sha512|
+|ECDSA|ecdsa_secp256r1_sha256, ecdsa_secp384r1_sha384, ecdsa_secp512r1_sha512|
+|EdDSA|ed25519, ed448|
+
+
+#### 3. Cipher suites (Bulk Encryption)
+
+TLS 1.3 defines only AEAD chiper suites.
+
+|Cipher Suite|Encryprtion algorithm|Hash Algorithm|
+|---|---|---|
+|TLS_AES_128_GCM_SHA256|AES-128-GCM|SHA-256|
+|TLS_AES_256_GCM_SHA384|AES-256-GCM|SHA-384|
+|TLS_CHASHA20_POLY1305_SHA256|ChaCha20-Poly1305|SHA-256|
+|TLS_AES_128_CCM_SHA256|AES-128-CCM|SHA-256|
+|TLS_AES_128_GCM_8_SHA256|AES-128-CCM-8|SHA-256|
+
+#### 4. Key Derivation
+
+TLS 1.3 uses:
+- HKDF-Extract
+- HKDF-Expand
+- HKDF-Expand-Label (TLS-Specific wrapper)
+- Derive-Secret (TLS-Specific helper)
+
+#### 5. Certificate Public Key Algorithm
+
+Certificates can contain public keys of various types
+
+Common types are
+- RSA
+- ECDSA 
+- Ed25519
+- Ed448
+
+These determine the type of public key in the certificate and the signature algorithm used in `CertificateVerify`
+
+#### 6. Record protection algorithms
+
+TLS 1.3 used AEAD ciphers, so encryption and integrity are combined.
+
+Supported AEAD modes:
+- AES-GCM
+- ChaCha20-Poly1305 
+- AES-CCM
+
+There are no seperate HMAC algorithms for record protection as in TLS 1.2
+
+#### 7. Removed algorithms compared to TLS 1.2
+
+TLS 1.3 removed several older algorithms and modes.
+
+|Removed|Reason|
+|---|---|
+|RSA key exchange|No forward secrecy|
+|Static DH|No forward secrecy|
+|RC4|Broken|
+|3DES|Weak or smaller key size|
+|CBC mode cipher suites|Vulnerable to padding oracle attacks|
+|MD5|Cryptographically broken|
+|SHA-1 for handshake signatures|No longer considered secure|
+|MAC-then-Encrypt construction|Replaced by AEAD|
+
+
 
 ### Important terms in the handshake
 
