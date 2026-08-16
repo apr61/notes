@@ -128,15 +128,65 @@ Coefficient (q^{-1} mod p)
 ## RSA encryption/decryption
 
 RSA's core mathematical property
+
+> Enryption
+
 ```text
-(m^e mod N)^d mod N = m
-(m^d mod N)^e mod N = m
+(m^e mod N) = CipherText
 ```
+
+> Decryption
+
+```text
+(CipherText)^d mod N = m
+```
+
 where
 - `m` is message
 - `e` is public exponent
 - `d` is private exponent
 - `N` is modulus
+
+
+### Problems in textbook RSA Encryption
+
+1. RSA encryption is deterministic
+
+- If we encrypt the same plaintext twice, we will get the same cipher text twice.
+
+```text
+Message          Ciphertext
+
+"YES"       →    ABC123
+"NO"        →    XYZ789
+"YES"       →    ABC123
+"YES"       →    ABC123
+```
+
+2. RSA encryption is malleable
+
+Given two RSA textbook ciphertexts,
+
+```txt
+y1 = (X1 ^ e) mod n
+
+y2 = (X2 ^ e) mod n
+```
+
+Where
+
+y1, y2 are ciphertexts
+X1, X2 are plain texts
+
+We can derive the ciphertexts of X1 x X2 by multiplying the two CipherTexts y1,y2 like this
+
+```txt
+(y1 x y2) mod n == ((X1 ^ e) x (X2 ^ e)) mod n == ((X1 x X2) ^ e) mod n
+```
+
+The result is `((X1 x X2) ^ e) mod n`, the ciphertext of the message `(X1 x X2) mod n`.
+The attacker could create a new ciphertext from two RSA ciphertexts, allowing them to compromise the security of our encryption by letting them deduce info about original message. 
+
 
 ### RSA encryption process
 - RSA uses public key for encryption
@@ -200,11 +250,35 @@ RSA signatures are based on the same as RSA enbcryption, but in reverse order.
 - Verify uses the public key `e`
 
 This is possible because of below property
+
+#### Sign
+
 ```text
-(m^d mod N)^e mod N = m   (if m < N)
+(m^d mod N) = S
+```
+
+#### Verify
+
+```txt
+S^e mod N = m 
 ```
 
 - RSA never signs the raw messages, it signs the hash that is wrapped in ASN.1 structure (PKCS#1 v1.5) or padded using RSA-PSS.
+
+### Problems in textbook RSA signature
+
+#### Problem #1
+
+Upon noticing that `(0 ^ d) mod n = 0`, `(1 ^ d) mod n = 1` and `(n - 1) ^ d mod n = n - 1`
+
+regardless of the value of the private key d, an attacker can forge signatures of 0, 1 and n-1 without knowing d.
+
+#### Problem #2 - Blinding Attacking
+
+![RSA Sign Verify](../../../../../assets/cryptography/rsa/rsa_sign_verify.jpeg)
+
+![RSA blinding attack](../../../../../assets/cryptography/rsa/rsa_blinding_attack.jpeg)
+
 
 ### RSA signing 
 Private key used for signing
@@ -277,4 +351,127 @@ If calculated_hash or extracted_digest match, signature is valid.
 - Signing large message directly is insecure and too slow
 - Hash defines message integrity
 
-## Padding algorithms used in RSA
+## RSAES-OEAP
+
+To make RSA encryption non-malleable, the ciphertexts should consist of the message data and some additional data called Padding.
+
+The standard way to encrypt with RSA in this fashion is to use Optimal Asymmetric Encryption Padding (OEAP).
+
+OEAP uses a pseudorandom number generator (PRNG) to ensure indistingushability and nonmalleability.
+
+### How OEAP Encryption works?
+
+In order to encrypt with RSA in OEAP mode, we meed a message (typically a symmetric key, K), a PRNG and two Hash functions.
+
+1. To encrypt K, the encoded message is formed M, `M = H || 00 ... 00 || 01 || K`
+
+> Where, H is h-byte constant defined by OEAP scheme, followed by as many 00 bytes needed and a 01 byte
+
+2. Next a h-byte random string R is generated.
+
+3. Calculate M' as `M' = M ⊕ Hash1(R)`
+
+> Where, Hash1(R) is as long as M.
+
+4. Calculate R' as `R' = R ⊕ Hash2(M')`
+> Where, Hash2(M') is as long as R
+
+5. Use M' and R', to form an m-byte string P, `P = 00 || M' || R'`
+> Where, P is as long as the modulus n and can be converted to integer less then n
+
+6. The result of this conversion is the number x, which is used to compute the RSA function `x ^ e mod n` to get the ciphertext.
+
+
+![RSA-OEAP Encryption Flow](../../../../../assets/cryptography/rsa/rsa-oeap-encryption-flow.png)
+
+
+### OEAP Decryption
+
+To decrypt the cipertext y, 
+
+1. Compute `x = y ^ d mod n`, and recover the values of M' and R'.
+
+2. Retrive initial value of M by computing `M' ⊕ Hash1(R' ⊕ Hash2(M'))`
+
+3. Verify if M is of format `H || 00 . . . 00 || 01 || K` and get the Key (K).
+
+In practice the parameters m and h (length of modulus and length of Hash2's output) is m = 256 bytes (for RSA 2048 bytes) and h = 32 (for SHA256 as Hash2).
+
+M size is 223 bytes (m - h - 1). This is the same output size as of Hash1
+
+K has size of 190 bytes (m - 2h - 2)
+
+OEAP block
+
+```txt
+P
+┌────┬───────────────────────────────┬────────────────┐
+│ 00 │          M' (223)             │    R' (32)     │
+│ 1  │                               │                │
+└────┴───────────────────────────────┴────────────────┘
+       223 bytes                       32 bytes
+
+       1 + 223 + 32 = 256
+```
+
+Inside M, before masking
+
+```txt
+M
+┌────────────┬───────────────┬────┬────────────────┐
+│ H (32)     │ 00...00       │ 01 │ K (max 190)    │
+└────────────┴───────────────┴────┴────────────────┘
+
+32 + padding + 1 + 190 = 223
+```
+
+- In order to build a hash with such unusual length, RSA standard describes the use of Mask Generator Function technique to create hash functions that are arbitrarily large hash values from any hash functions.
+
+
+## RSAPSS
+
+The RSA Probabilistic Standard Scheme (PSS) is to RSA signature what OEAP is for RSA encryption.
+
+It was designed to make message signing more secure, because of addition of padding data.
+
+Like OEAP, PSS also requires a PRNG and two hash functions.
+- One Hash1, is a typical hash with h-byte hash values such as SHA-256
+- Other Hash2, is a wide output hash like OEAP Hash2
+
+
+### How PSS signature procedure works
+
+For a message M
+
+1. Pick a r-byte random string R using PRNG
+
+2. Form an encoded message `M' = 0000000000000000 || Hash1(M) || R`, long of h + r + 8 bytes
+
+3. Compute the h-byte string `H = Hash1(M')`
+
+4. Set `L = 00...00 || 01 || R`, here the number of 00 bytes can be as long as the length of L is equal to m - h - 1
+
+5. Set `L = L ⊕ Hash2(H)`
+
+6. Convert the m-byte string `P = L || H || BC` to a number x, lower than n. Here, BC is a fixed value appended after H.
+
+7. Given the value of x, compute RSA function `x ^ d mod n` to obtain signature.
+
+To verify the signature given a message, M, compute Hash1(M) and use public compoent e and N to retrieve the L and H, and then M' from the signature, checking the padding at each step.
+
+
+In PSS standard, the R is often called *Salt* as is as long as hash value.
+
+For example, if you use n = 2048 bits and SHA-256 as hash, the value L is long of `m - h - 1 = 256 - 32 - 1 = 223 bytes.` And random string R would be of length 32 bytes.
+
+## PKCS #1
+
+### Encryption Schemes (ES)
+
+1. RSAES-OEAP 
+2. RSAES-PKCS1_v1_5 (Older RSA Encryption)
+
+### Signarture Schemes with Appendix (SSA)
+
+1. RSASSA-PSS
+2. RSASSA-PKCS1_v1_5 (Older RSA Signatures)
