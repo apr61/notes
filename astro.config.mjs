@@ -69,6 +69,17 @@ export default defineConfig({
                   label: "Smart pointers",
                   slug: "cpp/cpp-11/smart-pointers",
                 },
+                {
+                  label: "Multithreading",
+                  slug: "cpp/cpp-11/multi-threading"
+                }
+              ],
+              collapsed: true
+            },
+            {
+              label: "Design Patterns & Principles",
+              items: [
+                { label: "SOLID principles", slug: "cpp/deisgn-patterns-principles/solid-principles" },
               ],
               collapsed: true
             },

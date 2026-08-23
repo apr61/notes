@@ -42,7 +42,7 @@ date: 04/01/2026
 - [new-delete](pointers-references/pointers#new---delete-operators)
 - [Lvalue & Rvalue reference](pointers-references/references#lvalue-and-rvalue-reference-c-11)
 - [Perfect forwarding](pointers-references/references#perfect-forwarding)
-- [Smart pointers](cpp-11/smart-pointers)
+- [Smart pointers C11](cpp-11/smart-pointers)
 
 ## Cpp 11
 - [Lambda Expressions](cpp-11/lambda-functions)
@@ -84,3 +84,7 @@ date: 04/01/2026
 - make_unique
 - Return type deduction for functions
 
+
+## Design Patterns and Principles
+
+- [SOLID Principles](deisgn-patterns-principles/solid-principles)
