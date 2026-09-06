@@ -3,7 +3,7 @@ title: ECC Overview
 date: 22/11/2025
 ---
 
-ECC stands for Elliptic Curve Cryptography. It is a type of public key (asymmetric) cryptography based on the mathematics of elliptic curvesss over finite fields.
+ECC stands for Elliptic Curve Cryptography. It is a type of public key (asymmetric) cryptography based on the mathematics of elliptic curves over finite fields.
 
 It is widely used today because it provides same level of security as older systems like RSA but with much smaller key sizes, which makes it faster and more efficient.
 
@@ -24,6 +24,8 @@ Some of the standard curves recommended are
 - It is very easy to compute Q from P and k.
 
 - But it is extremely difficult to find k if you have only given P and Q.
+
+- When compared to DLP, ECDLP operates on points instead of numbers and multiplication is used instead of exponentiation.
 
 ## key size in ECC
 The 256-bit ECC key means totally three different but related things.
@@ -63,12 +65,14 @@ It is used for Authentication and integrity (digital signature).
 
 ### signing a message
 1. Hash the message: h = Hash(message)
-2. Generate a random nonce `k` (Critical: Must be unique and secret per signature)
-3. Compute point `R = k x G`, take x-coordinate -> `r = x_R mod n`
+2. Generate a random nonce `k` (Critical: Must be unique and secret per signature) between `1` and `n-1`
+3. Compute point `R = k x G`, with the co-ordinates (x,y),  take x-coordinate -> `r = x_R mod n`
 4. Compute `s = k⁻¹ × (h + d × r) mod n`
 5. Signature = pair `(r, s)`, here r and s are two numbers between 1 and n-1. The complete signature is just the pair (r, s)
 
-- Where `n` is the order of the elliptic curve group, more preciselly, the prime ordder of the base point G.`n` is a very large prime number such that `n x G = O` the point at infinity.
+- Where `n` is the order of the elliptic curve group, more preciselly, the prime order of the base point G.`n` is a very large prime number such that `n x G = O` the point at infinity.
+
+For example, when we are working with a curve where coordinates are 256-bit numbers, `r` and `s` would both be 256 bits long, yielding a **512 bit** long signature.
 
 ### Verification of message
 1. Anyone with public key `Q` can verify.
@@ -77,6 +81,78 @@ It is used for Authentication and integrity (digital signature).
 4. If `P.x mod n == r`, then the signature is valid
 
 `Note` : Never reuse the nonce `k` -> leads to private key recovery.
+
+
+## ECDSA vs RSA signatures
+
+- RSA is used for Signature and Encryption
+- ECC is a family of algorithms that can be used 
+    1. Encryption
+    2. Generate signatures
+    3. Perform key agreement
+    4. Offer advanced cryptographic operations such as identity based encryption
+
+| **Index**             | **RSA Signature**                          | **ECC (ECDSA) Signature**              |
+| --------------------- | ------------------------------------------ | -------------------------------------- |
+| **Key size**          | Large — e.g. 4096 bits                     | Small — e.g. 256 bits                  |
+| **Signature size**    | Large — ~4096 bits                         | Small — ~512 bits (`r` + `s`)          |
+| **Signing**           | Relatively slow                            | **Much faster**                        |
+| **Verification**      | **Very fast**                              | Fast                                   |
+| **Security**          | Strong                                     | Strong with much smaller keys          |
+| **Main advantage**    | Fast verification, mature/widely supported | Small keys/signatures and fast signing |
+| **Main disadvantage** | Large keys/signatures, slow signing        | More complex mathematics               |
+
+
+RSA uses large integers and is especially efficient at verification, while ECDSA uses much smaller elliptic-curve numbers, resulting in smaller signatures and significantly faster signing at a similar security level.
+
+Example on RSA vs ECC operations
+
+```sh
+$ openssl speed ecdsap256 rsa4096
+                              sign    verify    sign/s verify/s
+rsa 4096 bits                0.003620s 0.000054s    276.3  18687.0
+                              sign    verify    sign/s verify/s
+256 bits ecdsa (nistp256)   0.0000s   0.0001s  49139.4  16987.6
+```
+
+## Encrypting with Elliptic Curves
+
+ECC is mainly used for Signing and verification. We can still encrypt with ECC.
+
+But there is a restriction in the size of plaintext that can be encrypted.
+ECC can only fit about ***100 bits*** where as RSA can fit upto ***4000 bits*** with the same security level.
+
+Encryption can be done with **Integrated Encryption Scheme - IES**.
+
+### ECIES - Elliptic Curve Integrated Encryption Scheme
+
+IES is a hybrid asymmetric-symmetric key encryption algorithm based on the Diffie-Hellman Key exchange.
+
+IES encrypts a message by 
+    - generating a Diffie-Hellman key pair
+    - combining the private key with the recipient's own public key
+    - deriving a symmetric key from the shared secret obtained 
+    - using a authenticated cipher to encrypt the message
+
+When used with elliptic-curves, IES relies on ECDLP's hardness and is called Elliptic Curve Integrated Encryption Scheme
+
+Given a recipient public key P and message M, ECIES encrypts as follows
+
+#### Encryption
+
+1. Generate a random number `d`, and compute the point `Q = dG`, where the base point G is a fixed parameter. Here, (d, Q) acts as ephemeral key pair, used only to encrypt `M`
+
+2. Compute an ECDH shared secret by computing `S = dP`
+
+3. Use a key derivation scheme (KDF) to derive a symmetric key `K` from `S`.
+
+4. Encrypt `M` using `K` and a symmetric authenticated cipher, obtaining a ciphertext `C` with authentication tag `T`
+
+#### Decryption
+
+1. The recipient computes `S` by multiplying `Q` with its private exponent.
+2. Derive `K` from `S` and decrypt `C` and verify `T`.
+
 
 
 ## ECDH - Elliptic Curve Diffie-Hellman
@@ -143,4 +219,27 @@ When the key exchange starts, the parties generate ephemeral key pairs. When the
 | Man-in-the-Middle protection | Only if public keys are authenticated | Only if ephemeral public keys are signed/authenticated |
 | TLS cipher suite examples | TLS_ECDH_RSA_WITH_AES_128_GCM_SHA256 | TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 |
 | Vulnerable to future key compromise? | Yes — if long-term private key leaks, all past sessions can be decrypted | No — even if long-term key leaks later, past sessions remain safe |
+
+
+## Curves
+
+### NIST curves
+
+There are 15 NIST curves
+
+1. 5 Prime curves - Work modulo a prime number
+2. 10 Binary polynomial curves - Mathematical objects that make implementation in hardware efficient
+
+The most common NIST prime curve is p-256.
+
+It is a curve that works over numbers modulo the 256-bit number `p = 2 ^ 256 – 2 ^ 224 + 2 ^ 192 + 2 ^ 96 – 1`
+The equation for P-256 is `y^2 = x^3 - 3x + b` where `b` is a 256 bit number.
+
+NIST also provides other prime curves of 192 bits, 224 bits, 384 bits and 521 bits.
+
+### curve25519
+
+The form of Curve25519 equation is `y ^ 2 = x ^ 3 + 486662 x ^ 2 + x`. 
+
+Curve25519 works with numbers modulo the prime number `2 ^ 255 - 19`, a 256 bit prime number that is as close as possible to `2 ^ 255`.
 

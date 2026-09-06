@@ -19,6 +19,7 @@ export default defineConfig({
               items: [
                 { label: "Memory model", slug: "cpp/basics/memory-model" },
                 { label: "Compilation stages", slug: "cpp/basics/compilation-stages" },
+                { label: "Bitwise Operators", slug: "cpp/basics/bitwise-operators" },
                 {
                   label: "Type Casters",
                   slug: "cpp/basics/advanced-type-casters-in-cpp",
@@ -128,6 +129,10 @@ export default defineConfig({
                     {
                       label: "CMS overview",
                       slug: "cryptography/misc/cms"
+                    },
+                    {
+                      label: "Diffie-Hellman",
+                      slug: "cryptography/misc/diffie-hellman"
                     }
                   ]
                 },
@@ -147,6 +152,10 @@ export default defineConfig({
                 {
                   label: "Cryptography Terms",
                   slug: "cryptography/tls/cryptography_terms"
+                },
+                {
+                  label: "TLS version diff",
+                  slug: "cryptography/tls/tls_version_diff"
                 },
                 {
                   label: "PKI",

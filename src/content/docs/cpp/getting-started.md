@@ -6,7 +6,7 @@ date: 04/01/2026
 ## Basic Concepts
 - [Memory Model](basics/memory-model)
 - [Compilation stages](basics/compilation-stages)
-- Bitwise operators 
+- [Bitwise operators](basics/bitwise-operators) 
 - [Operator Overloading](basics/operator-overloading-in-cpp)
 - Namespaces
 - [Type Casting](basics/advanced-type-casters-in-cpp)

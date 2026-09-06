@@ -351,21 +351,21 @@ If calculated_hash or extracted_digest match, signature is valid.
 - Signing large message directly is insecure and too slow
 - Hash defines message integrity
 
-## RSAES-OEAP
+## RSAES-OAEP
 
 To make RSA encryption non-malleable, the ciphertexts should consist of the message data and some additional data called Padding.
 
-The standard way to encrypt with RSA in this fashion is to use Optimal Asymmetric Encryption Padding (OEAP).
+The standard way to encrypt with RSA in this fashion is to use Optimal Asymmetric Encryption Padding (OAEP).
 
-OEAP uses a pseudorandom number generator (PRNG) to ensure indistingushability and nonmalleability.
+OAEP uses a pseudorandom number generator (PRNG) to ensure indistingushability and nonmalleability.
 
-### How OEAP Encryption works?
+### How OAEP Encryption works?
 
-In order to encrypt with RSA in OEAP mode, we meed a message (typically a symmetric key, K), a PRNG and two Hash functions.
+In order to encrypt with RSA in OAEP mode, we meed a message (typically a symmetric key, K), a PRNG and two Hash functions.
 
 1. To encrypt K, the encoded message is formed M, `M = H || 00 ... 00 || 01 || K`
 
-> Where, H is h-byte constant defined by OEAP scheme, followed by as many 00 bytes needed and a 01 byte
+> Where, H is h-byte constant defined by OAEP scheme, followed by as many 00 bytes needed and a 01 byte
 
 2. Next a h-byte random string R is generated.
 
@@ -382,10 +382,10 @@ In order to encrypt with RSA in OEAP mode, we meed a message (typically a symmet
 6. The result of this conversion is the number x, which is used to compute the RSA function `x ^ e mod n` to get the ciphertext.
 
 
-![RSA-OEAP Encryption Flow](../../../../../assets/cryptography/rsa/rsa-oeap-encryption-flow.png)
+![RSA-OAEP Encryption Flow](../../../../../assets/cryptography/rsa/rsa-OAEP-encryption-flow.png)
 
 
-### OEAP Decryption
+### OAEP Decryption
 
 To decrypt the cipertext y, 
 
@@ -401,7 +401,7 @@ M size is 223 bytes (m - h - 1). This is the same output size as of Hash1
 
 K has size of 190 bytes (m - 2h - 2)
 
-OEAP block
+OAEP block
 
 ```txt
 P
@@ -430,13 +430,13 @@ M
 
 ## RSAPSS
 
-The RSA Probabilistic Standard Scheme (PSS) is to RSA signature what OEAP is for RSA encryption.
+The RSA Probabilistic Standard Scheme (PSS) is to RSA signature what OAEP is for RSA encryption.
 
 It was designed to make message signing more secure, because of addition of padding data.
 
-Like OEAP, PSS also requires a PRNG and two hash functions.
+Like OAEP, PSS also requires a PRNG and two hash functions.
 - One Hash1, is a typical hash with h-byte hash values such as SHA-256
-- Other Hash2, is a wide output hash like OEAP Hash2
+- Other Hash2, is a wide output hash like OAEP Hash2
 
 
 ### How PSS signature procedure works
@@ -468,7 +468,7 @@ For example, if you use n = 2048 bits and SHA-256 as hash, the value L is long o
 
 ### Encryption Schemes (ES)
 
-1. RSAES-OEAP 
+1. RSAES-OAEP 
 2. RSAES-PKCS1_v1_5 (Older RSA Encryption)
 
 ### Signarture Schemes with Appendix (SSA)
