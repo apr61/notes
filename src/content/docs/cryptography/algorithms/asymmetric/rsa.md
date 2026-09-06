@@ -382,7 +382,7 @@ In order to encrypt with RSA in OAEP mode, we meed a message (typically a symmet
 6. The result of this conversion is the number x, which is used to compute the RSA function `x ^ e mod n` to get the ciphertext.
 
 
-![RSA-OAEP Encryption Flow](../../../../../assets/cryptography/rsa/rsa-OAEP-encryption-flow.png)
+![RSA-OAEP Encryption Flow](../../../../../assets/cryptography/rsa/rsa-oaep-encryption-flow.png)
 
 
 ### OAEP Decryption
