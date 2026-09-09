@@ -5,16 +5,16 @@ date: 18/01/2026
 
 Smart pointers in C++ are RAII-based objects that automatically manage the lifetime of dynamically allocated objects.
 
-### Types of Smart pointers
+# Types of Smart pointers
 1. unique_ptr
 2. shared_ptr
 3. weak_ptr
 
-### unique_ptr
+## unique_ptr
 1. Stores only one pointer at a time.
 2. Cannot be copied.
 3. Ownership can be transferred using `std::move`
-4. `unique_ptr` are always passeed as reference to functions. Because copy constructor is deleted in `unique_ptr`
+4. `unique_ptr` are always passed as reference to functions. Because copy constructor is deleted in `unique_ptr`
 
 #### Example
 
@@ -95,6 +95,223 @@ int main()
 }
 ```
 
+#### Initialize raw array of unique_ptr
+
+```c++
+#include <iostream>
+#include <memory>
+
+int main()
+{
+    // Raw array of unique_ptr
+    std::unique_ptr<int[]> up_arr(nullptr);
+
+    up_arr.reset(new int[5]{1, 2, 3, 4, 5});
+
+    for(int i = 0; i < 5; i++)
+    {
+        std::cout << up_arr[i] << std::endl;
+    }
+}
+```
+
+### Custom deleter in unique_ptr
+
+Let's below classes as example. 
+
+```c++
+#include <iostream>
+#include <memory>
+
+class Investment{
+public:
+    Investment(int principal) : m_principal{principal}
+    {
+    }
+    virtual ~Investment()
+    {
+        std::cout << "~Investment() called..." << std::endl;
+    }
+protected:
+    int m_principal{};
+};
+
+class Stock: public Investment
+{
+public:
+    Stock(int numOfStocks, int principal) : Investment(principal),  m_numOfStocks{numOfStocks}
+    {
+    }
+    ~Stock()
+    {
+        std::cout << "~Stock() called..." << std::endl;
+    }
+private:
+    int m_numOfStocks{};
+};
+
+class Bond: public Investment {
+public:
+    Bond(int numOfBonds, int principal) : Investment(principal),  m_numOfBonds{numOfBonds}
+    {
+    }
+    ~Bond()
+    {
+        std::cout << "~Bond() called..." << std::endl;
+    }
+private:
+    int m_numOfBonds{};
+};
+
+template <typename... Ts>
+std::unique_ptr<Investment>
+makeInvestment(int objType, Ts&&... params)
+{
+    std::unique_ptr<Investment> pInv(nullptr);
+
+    if(objType == 1)
+    {
+        pInv.reset(new Bond(std::forward<Ts>(params)...));
+    }
+    else if(objType == 2)
+    {
+        pInv.reset(new Stock(std::forward<Ts>(params)...));
+    }
+
+    return pInv;
+}
+
+int main()
+{
+    auto aInvs = makeInvestment(1, 10, 10000);
+
+    auto bInvs = makeInvestment(2, 100, 10000);
+}
+
+```
+
+The makeInvestment creates a `Investment` object based on the object that needs to be created, like `Stock` or `Bond`.
+
+Let's say we want to a custom deleter function when `std::unique_ptr` goes out of scope.
+
+We can achive this by having deleter functions in two ways
+1. Lambda functions
+2. function pointers
+
+#### Lambda functions
+
+```c++
+//... other code
+
+auto delInv = [](Investment * investment) // The function takes Raw pointer as i/p
+{
+    std::cout << "Deleting Investment obj" << std::endl;
+    delete investment;
+};
+
+template <typename... Ts>
+std::unique_ptr<Investment, decltype(delInv)>
+makeInvestment(int objTpye, Ts&&... params)
+{
+    // This declaration is essential
+    // Without this unique_ptr will take default delete function
+    std::unique_ptr<Investment, decltype(delInv)> pInv(nullptr, delInv);
+
+    // ... rest of the code
+}
+
+int main()
+{
+    auto aInvs = makeInvestment(1, 10, 10000);
+    std::cout << "sizeof(pInvestment) :: " << sizeof(pInvestment) << std::endl;
+}
+```
+
+##### O/p
+
+```sh
+sizeof(pInvestment) :: 8
+Deleting investment obj
+~Stock() called...
+~Investment() called...
+```
+
+#### Function pointer
+
+```c++
+//... other code
+void delInvmt2(Investment * pInvestment)
+{
+    std::cout << "Deleting investment obj" << std::endl;
+    delete pInvestment;
+};
+
+template <typename... Ts>
+std::unique_ptr<Investment, void (*)(Investment *)> 
+// return type has size of Investment* plus atleast size of function pointer!
+makeInvestment(int objType, Ts&&... params)
+{
+    std::unique_ptr<Investment, void (*)(Investment *)> pInv(nullptr, delInvmt2);
+
+    // ... rest of the code
+}
+
+int main()
+{
+    auto aInvs = makeInvestment(1, 10, 10000);
+    std::cout << "sizeof(pInvestment) :: " << sizeof(pInvestment) << std::endl;
+}
+```
+
+##### O/p
+
+```sh
+sizeof(pInvestment) :: 16 # unique_ptr size has increased
+Deleting investment obj
+~Stock() called...
+~Investment() called...
+```
+
+- When using function pointer, the size of unique_ptr has increased because of size of function pointer.
+
+- Prefer lamda delete function over function pointers.
+
+#### C++ 14 version
+
+```c++ 
+template <typename... Ts>
+auto makeInvestment(int objType, Ts&&... params)
+{
+    // Lambda function is inside factory function
+    auto delInv = [](Investment * pInvestment) 
+    {
+        std::cout << "Deleting Investment obj" << std::endl;
+        delete pInvestment;
+    };
+
+    std::unique_ptr<Investment, decltype(delInv)> pInv(nullptr, delInv);
+
+    if(objType == 1)
+    {
+        pInv.reset(new Bond(std::forward<Ts>(params)...));
+    }
+    else if(objType == 2)
+    {
+        pInv.reset(new Stock(std::forward<Ts>(params)...));
+    }
+
+    return pInv;
+}
+
+
+int main()
+{
+    auto pInvestment = makeInvestment(2, 10, 10000);
+
+    std::cout << "sizeof(pInvestment) :: " << sizeof(pInvestment) << std::endl;
+}
+```
+
 ### make_unique (c++ 14)
 - It is used to create a `unique_ptr` object
 - Object gets destoryed, when `unique_ptr` gets out of scope
@@ -124,7 +341,7 @@ cA::display: this = 0x5e4e2bc77d50, m_i = 200
 cA::display: this = 0x5e4e2bc77920, m_i = 100
 ```
 
-### shared_ptr
+## shared_ptr
 - Allows multiple pointers to share the ownership of the same object.
 - Reference counting is used to manage ownership
 - `shared_ptr` expects objects/resources created in heap. It takes the ownership of the object.
@@ -186,7 +403,7 @@ sp1.use_count = 1
 sp1.use_count = 2 // Reference count increased
 ```
 
-#### Custom shared_ptr
+### Custom shared_ptr
 
 ```c++
 template <typename T>
@@ -222,7 +439,7 @@ public:
 };
 ```
 
-### weak_ptr
+## weak_ptr
 - It is a non-owning smart pointer used only with `shared_ptr`
 - It observes an object without extending the lifetime
 - `weak_ptr` lets you refer to an object managed by `shared_ptr` without increasing the reference count
