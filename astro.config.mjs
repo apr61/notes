@@ -81,6 +81,7 @@ export default defineConfig({
               label: "Design Patterns & Principles",
               items: [
                 { label: "SOLID principles", slug: "cpp/deisgn-patterns-principles/solid-principles" },
+                { label: "Pimpl Idiom", slug: "cpp/deisgn-patterns-principles/pimpl-idiom" },
               ],
               collapsed: true
             },
