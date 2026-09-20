@@ -49,12 +49,12 @@ date: 04/01/2026
 - Variadic Templates
 - [Type inference](cpp-11/type-inference)
 - Move semantics
-- Uniform initialization
+- [Uniform initialization](cpp-11/uniform-initialization)
 - static_assert
 - constexpr
-- deleted functions
+- [deleted functions](cpp-11/misc#deleted-functions)
 - Default functions
-- enum classes
+- [enum classes](cpp-11/misc#scoped-enums)
 - Raw string literals
 - function
 - bind
@@ -63,7 +63,8 @@ date: 04/01/2026
 - regex
 - random
 - tuple
-- nullptr
+- [nullptr](cpp-11/misc#nullptr-over-0-and-null)
+- [alias declarations](cpp-11/misc#alias-declarations-to-typedef)
 
 ### Multithreading
 - Thread
@@ -81,10 +82,11 @@ date: 04/01/2026
 - Variable templates
 - binary literals
 - digit separators
-- make_unique
+- [make_unique](cpp-11/smart-pointers#make_unique-c-14)
 - Return type deduction for functions
 
 
 ## Design Patterns and Principles
 
 - [SOLID Principles](deisgn-patterns-principles/solid-principles)
+- [Pimpl Idiom](deisgn-patterns-principles/pimpl-idiom)

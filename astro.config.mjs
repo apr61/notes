@@ -73,6 +73,14 @@ export default defineConfig({
                 {
                   label: "Multithreading",
                   slug: "cpp/cpp-11/multi-threading"
+                },
+                {
+                  label: "Uniform Initialization",
+                  slug: "cpp/cpp-11/uniform-initialization"
+                },
+                {
+                  label: "Other C++ 11",
+                  slug: "cpp/cpp-11/misc"
                 }
               ],
               collapsed: true
