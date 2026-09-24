@@ -283,3 +283,142 @@ void processRequest<const void>(const void*) = delete;
 template<>
 void processRequest<const char>(const char *) = delete;
 ```
+
+## noexcept
+
+`noexcept` specifier is primarily used to optimize performance by unlocking move semantics in the standard containers and guarantee code safety by specifying that a function will not throw exception.
+
+- `noexcept` is part of a function's interface and client can depend on it.
+- `noexcept` functions are more optimizable than non-except functions.
+- `noexcept` is particularly valuable for move operations, swap, memory dellocation functions and destructors.
+- By default, all memory deallocation functions (operator delete, operator delete[]) and destructors are noexcept.
+
+```c++
+void foo()
+{
+    Widget w;
+    throw std::runtime_error("error");
+}
+```
+
+While handling the exception, `w`'s destructor is runs. If the destructor itself throws another exception
+
+```sh
+original exception
+       +
+destructor exception
+       ↓
+two exceptions escaping
+       ↓
+std::terminate()
+```
+
+Therefore, destructors should generally never throw.
+
+- If a `noexcept` declared function, throws an exception then the C++ calls the `std::terminate()` terminate the program execution because the exception cannot be propagated out of function.
+
+
+### Why use `noexcept`
+
+#### `std::vector` reallocation problem
+
+The most critical use of noexcept is for move constructors and move assignment operators.
+
+Standard library containers like `std::vector` should provide strong exception guarantee: if an operation fails, the containers must return to it's original state.
+
+__Without `noexcept`__:
+
+1. When a vector resizes, it allocates a larger chunk of memory and must migrate all the objects.
+2. If the move constructor isn't declared noexcept, std::vector::push_back falls back to copying every single element.
+3. It does this because if a move operation throws an exception halfway through, the original data is already modified or destroyed, making a rollback impossible.
+
+__With `noexcept`__:
+
+1. The vector can use the `std::move_if_noexcept` trait.
+2. Knowing that move cannot fail, it safely and rapidly moves the object instead of copying.
+
+
+#### Compiler optimization
+
+- When a compiler knows that a function is strictly non-throwing, it can skip generating the heavy binary bloat and overhead required for stack unwinding.
+
+> Stack unwinding: The process of cleaning up local variables as an exception bubbles up the stack.
+
+- This results in smaller and faster binaries.
+
+
+### Conditional noexcept
+
+Conditional noexcept functions states whether they are noexcept depends on whether the expressions inside the noexcept clauses are noexcept.
+
+The noexcept tell whether a provided function gives an exception or not.
+
+```c++
+void foo() noexcept
+{
+} // function will never throw exception
+```
+
+We can ask compiler 
+
+```c++
+std::cout << noexcept(foo()) << std::endl;
+// 0 -> if an exception is thrown
+// 1 -> if no exception
+```
+
+Based on this we can check if a function can throw exception based on the input parameters passed to it.
+
+
+```c++
+template <class T, size_t N>
+void swap(T (&a)[N],
+          T (&b)[N]) noexcept(noexcept(swap(*a, *b)));
+```
+
+Given two arrays of Widget, swapping them is noexcept only if swapping individual elements in the arrays in noexcept, i.e., if swap for Widget is noexcept.
+
+
+```c++
+class A
+{
+public:
+    A(const A&) noexcept {}
+};
+
+class B
+{
+public:
+    B(const B&) {}
+};
+
+std::cout << noexcept(A(std::declval<A>())) << '\n'; // 1
+
+std::cout << noexcept(B(std::declval<B>())) << '\n'; // 0
+
+template<typename T>
+void process(const T& obj)
+    noexcept(noexcept(T(obj)))
+{
+    T copy(obj);
+}
+```
+
+In the template, 
+the compiler checks if `noexcept(T(obj))` is a non-throwing expression to a compile time boolean (true or false)
+
+The outer `noexcept(...)` uses the boolean to specify whether process itself is non-throwing.
+
+```md
+            inner
+        noexcept(T(obj))
+            |
+            v
+        true / false
+            |
+            v
+        outer noexcept
+            |
+            v
+    process() is or isn't noexcept
+```

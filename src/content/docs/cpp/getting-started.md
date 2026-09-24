@@ -65,6 +65,7 @@ date: 04/01/2026
 - tuple
 - [nullptr](cpp-11/misc#nullptr-over-0-and-null)
 - [alias declarations](cpp-11/misc#alias-declarations-to-typedef)
+- [noexcept](cpp-11/misc#noexcept)
 
 ### Multithreading
 - Thread
