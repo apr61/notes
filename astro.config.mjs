@@ -79,6 +79,10 @@ export default defineConfig({
                   slug: "cpp/cpp-11/uniform-initialization"
                 },
                 {
+                  label: "References",
+                  slug: "cpp/cpp-11/references"
+                },
+                {
                   label: "Other C++ 11",
                   slug: "cpp/cpp-11/misc"
                 }
