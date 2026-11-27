@@ -85,6 +85,7 @@ date: 04/01/2026
 - digit separators
 - [make_unique](cpp-11/smart-pointers#make_unique-c-14)
 - Return type deduction for functions
+- [Generic lambda](cpp-14/generic-lambda)
 
 
 ## Design Patterns and Principles

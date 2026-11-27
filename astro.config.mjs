@@ -90,6 +90,13 @@ export default defineConfig({
               collapsed: true
             },
             {
+              label: "CPP 14",
+              items: [
+                { label: "Generic Lambda", slug: "cpp/cpp-14/generic-lambda" },
+              ],
+              collapsed: true
+            },
+            {
               label: "Design Patterns & Principles",
               items: [
                 { label: "SOLID principles", slug: "cpp/deisgn-patterns-principles/solid-principles" },

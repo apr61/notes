@@ -3,6 +3,29 @@ title: Lambda functions in C++
 date: 20/8/2024
 ---
 
+## Closure
+
+A closure is the runtime object created by lambda. Depending on the capture mode, closures hold copies of or references to the captured data.
+
+## Closure class
+
+A closure class is a class from which a closure is instantiated. Each lambda causes compilers to generate a unique closure class. 
+
+A lambda is often used to create a closure that's used only as an argument to a function.  Closures may generally be copied.
+
+
+```c++
+int main()
+{
+	int x = 10;
+	auto c1 = [x](int y) {return x * y > 55;}; // c1 is copy of the 
+						   // closure produced by lambda
+
+	auto c2 = c1;  // c2 is copy of c1
+	auto c3 = c2;  // c3 is copy of c2
+}
+```
+
 ### Callable / Functors
 
 A Callable/ Functors object is something that can be called like a function. The operator overload of `()` makes a callable.
@@ -117,6 +140,78 @@ add(10,15) = 25
 ### Capture clause
 
 Capture clause can capture all variables that are till the lambda function.
+
+#### Capture by reference
+
+- A by-reference capture causes a closure to contain a reference to local variable or to a parameter that's available in the scope where the lambda is defined.
+
+- If the lifetime of a closure created from that lambda exceeds the lifetime of the local variable or parameter, the reference in the closure will dangle.
+
+```c++
+using FilterContainer = std::vector<std::function<bool(int)>>;
+
+FilterContainer filters;
+
+void addDivisorFilter()
+{
+  auto calc1 = computeSomeValue1();
+  auto calc2 = computeSomeValue2();
+  auto divisor = computeDivisor(calc1, calc2);
+  filters.emplace_back(                              
+	[&](int value) { return value % divisor == 0; }  // Danger!, ref to 
+							 // divisor will dangle!
+  );       
+
+  // The same problem will exist if by-reference capture were explicit
+  filters.emplace_back(
+  	[&divisor](int value)              // danger! ref to divisor 
+  	{ return value % divisor == 0; }   // will still dangle!     
+  );                                                                              
+}     
+                                               
+```
+
+#### Capture by value
+
+- Default by-value capture is susceptible to dangling pointers (especially this).
+
+- Captures apply only to non-static local variables (including parameters) visible in the scope where the lambda is created.
+
+Lets consider below example
+
+```c++
+class Widget {
+public:
+  …                                  
+  void addFilter() const;            
+private:
+  int divisor;                       
+};
+
+void Widget::addFilter() const
+{
+  filters.emplace_back(
+	// we may assume that, divisor will be accessible 
+	// in the lambda, but it won't.
+	[=](int value) { return value % divisor == 0; }
+  );
+}
+```
+
+This issue is because of the implicit use of raw pointer: `this`. Every non-static member function has a `this` pointer. Inside member functions, compilers will replace divisor with this->divisor.
+
+This can be resolved my making a local copy of the data member.
+
+```c++
+void Widget::addFilter() const
+{
+  auto divisorCopy = divisor;          // copy data member      
+  filters.emplace_back(
+	[divisorCopy](int value)       // capture the copy          
+	{ return value % divisorCopy == 0; }    // use the copy 
+  );
+}
+```
 
 1. Capture variable by value
 
